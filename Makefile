@@ -11,7 +11,7 @@ all: yuarel
 
 .PHONY: yuarel
 yuarel: $(SRC_FILES) $(OBJ_FILES)
-	@echo -ne "\e[33mBuilding libyuarel.so...\e[0m\n"
+	@echo "Building libyuarel.so..."
 	$(CC) $(LDFLAGS) $(OBJ_FILES) -o libyuarel.so
 
 %.o: %.c

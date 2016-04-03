@@ -3,14 +3,41 @@
 #include <string.h>
 #include "yuarel.h"
 
+/**
+ * Parse a non NULL terminated string into an integer.
+ *
+ * str: pointer to the string containing the number.
+ * len: Number of characters to parse.
+ */
+static int
+natoi(char *str, size_t len)
+{
+	int i, r = 0;
+
+	for (i = 0; i < len; i++) {
+		r *= 10;
+		r += str[i] - '0';
+	}
+
+	return r;
+}
+
+/**
+ * Parse a URL string to a struct.
+ *
+ * url: pointer to the struct where to store the parsed URL parts.
+ * u:   the URL string to be parsed.
+ *
+ * Returns 0 on success, otherwise -1.
+ */
 int
 yuarel_parse(struct yuarel *url, char *u)
 {
-	memset(url, 0, sizeof (struct yuarel));
-
 	if (NULL == url || NULL == u) {
 		return -1;
 	}
+
+	memset(url, 0, sizeof (struct yuarel));
 
 	/* Scheme */
 	url->scheme = u;
@@ -18,15 +45,14 @@ yuarel_parse(struct yuarel *url, char *u)
 	if (NULL == u) {
 		return -1;
 	}
-	*(u++) = '\0';
+	*(u++) = '\0'; // Replace ':' with NULL
 
-	/* Rewind to after :// */
+	/* Rewind to after // */
 	while ('/' == *(u++))
 		;
 
 	/* Host */
-	u--;
-	if ('\0' == *u) {
+	if ('\0' == *(--u)) {
 		return -1;
 	}
 	url->host = u;
@@ -53,10 +79,8 @@ yuarel_parse(struct yuarel *url, char *u)
 			return -1;
 		}
 
-		if (url->path && url->path > u) {
-			char *p = strndup(u, url->path - u);
-			url->port = atoi(p);
-			free(p);
+		if (url->path) {
+			url->port = natoi(u, url->path - u - 1);
 		} else {
 			url->port = atoi(u);
 		}
