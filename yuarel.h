@@ -26,11 +26,23 @@ struct yuarel {
  *
  * The following parts will be parsed to the coresponding struct member.
  *
- * *url is a pointer to the struct where to store the parsed values.
- * *url_str is a pointer to the url to be parsed (NULL terminated).
+ * *url is:  a pointer to the struct where to store the parsed values.
+ * *url_str: a pointer to the url to be parsed (NULL terminated).
  *
  * Returns 0 on success, otherwise -1.
  */
 extern int yuarel_parse(struct yuarel *url, char *url_str);
+
+/**
+ * Split a path into several strings.
+ *
+ * No data is copied, the slashed are used as NULL terminators and then
+ * pointers to each path part will be stored in **parts.
+ *
+ * *path:     the path to split.
+ * **parts:   a pointer to an array of (char *) where to store the result.
+ * max_parts: max number of parts to parse.
+ */
+extern int yuarel_split_path(char *path, char **parts, int max_parts);
 
 #endif /* INC_YUAREL_H */

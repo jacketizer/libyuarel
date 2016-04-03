@@ -9,11 +9,10 @@
  * str: pointer to the string containing the number.
  * len: Number of characters to parse.
  */
-static int
+static inline int
 natoi(char *str, size_t len)
 {
 	int i, r = 0;
-
 	for (i = 0; i < len; i++) {
 		r *= 10;
 		r += str[i] - '0';
@@ -48,11 +47,10 @@ yuarel_parse(struct yuarel *url, char *u)
 	*(u++) = '\0'; // Replace ':' with NULL
 
 	/* Rewind to after // */
-	while ('/' == *(u++))
-		;
+	while ('/' == *u) u++;
 
 	/* Host */
-	if ('\0' == *(--u)) {
+	if ('\0' == *u) {
 		return -1;
 	}
 	url->host = u;
@@ -87,4 +85,32 @@ yuarel_parse(struct yuarel *url, char *u)
 	}
 
 	return 0;
+}
+
+/**
+ * Split a path into several strings.
+ *
+ * No data is copied, the slashed are used as NULL terminators and then
+ * pointers to each path part will be stored in **parts.
+ *
+ * *path:     the path to split.
+ * **parts:   a pointer to an array of (char *) where to store the result.
+ * max_parts: max number of parts to parse.
+ */
+int
+yuarel_split_path(char *path, char **parts, int max_parts)
+{
+	int i = 0;
+
+	/* Rewind to after slashes */
+	while ('/' == *path) path++;
+
+	parts[i++] = path;
+
+	while (i < max_parts && (path = strchr(path, '/')) != NULL) {
+		*path = '\0';
+		parts[i++] = ++path;
+	}
+
+	return i;
 }
