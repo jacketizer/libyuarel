@@ -3,11 +3,6 @@
 #include <string.h>
 #include "yuarel.h"
 
-#define find_or_return(search_string, find_char) search_string = strchr(search_string, find_char);\
-		if (NULL == search_string) return -1
-
-#define terminate(str_ptr) *(str_ptr++) = '\0'
-
 int
 yuarel_parse(struct yuarel *url, char *u)
 {
@@ -19,8 +14,11 @@ yuarel_parse(struct yuarel *url, char *u)
 
 	/* Scheme */
 	url->scheme = u;
-	find_or_return(u, ':');
-	terminate(u);
+	u = strchr(u, ':');
+	if (NULL == u) {
+		return -1;
+	}
+	*(u++) = '\0';
 
 	/* Rewind to after :// */
 	while ('/' == *(u++))
@@ -36,21 +34,21 @@ yuarel_parse(struct yuarel *url, char *u)
 	/* (Query) */
 	u = strchr(u, '?');
 	if (NULL != u) {
-		terminate(u);
+		*(u++) = '\0';
 		url->query = u;
 	}
 
 	/* (Path) */
 	u = strchr(url->host, '/');
 	if (NULL != u && u < url->query) {
-		terminate(u);
+		*(u++) = '\0';
 		url->path = u;
 	}
 
 	/* (Port) */
 	u = strchr(url->host, ':');
 	if (NULL != u && (!url->query || u < url->query) && (!url->path || u < url->path)) {
-		terminate(u);
+		*(u++) = '\0';
 		if ('\0' == *u) {
 			return -1;
 		}
