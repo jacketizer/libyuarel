@@ -13,8 +13,8 @@ Parts within `[` and `]` are optional. A minimal URL could look like this:
 `proto:hostname`
 
 Due to the fact that the library isn't copying any strings and instead points
-to the parts in the URL string, the first `/` in the path will be used as a
-null terminator. Therefore, the first slash will be missing in the path.
+to the parts in the URL string, the first `/` in the path will be replaced with
+a null terminator. Therefore, the first slash will be missing in the path.
 
 ## To build
 
@@ -38,10 +38,10 @@ $ ./simple
 
 ## Library functions
 
-### Parse a URL to a struct.
+### Parse a URL to a struct
 
 ```C
-`int yuarel_parse(struct yuarel *url, char *url_str)`
+int yuarel_parse(struct yuarel *url, char *url_str)
 ```
 
 `struct yuarel *url`: a pointer to the struct where to store the parsed values.
@@ -50,10 +50,10 @@ $ ./simple
 
 Returns 0 on success, otherwise -1.
 
-### Split a path into several strings.
+### Split a path into several strings
 
 ```C
-int yuarel_split_path(char *path, char **parts, int max_parts)`
+int yuarel_split_path(char *path, char **parts, int max_parts)
 ```
 
 No data is copied, the slashed are used as null terminators and then
@@ -64,6 +64,8 @@ pointers to each path part will be stored in `parts`.
 `char **parts`: a pointer to an array of `(char *)` where to store the result.
 
 `int max_parts`: max number of parts to parse.
+
+Returns the number of parsed items. -1 on error.
 
 ## How to use it:
 

@@ -42,6 +42,8 @@ extern int yuarel_parse(struct yuarel *url, char *url_str);
  * *path:     the path to split.
  * **parts:   a pointer to an array of (char *) where to store the result.
  * max_parts: max number of parts to parse.
+ *
+ * Returns the number of parsed items. -1 on error.
  */
 extern int yuarel_split_path(char *path, char **parts, int max_parts);
 
