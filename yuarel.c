@@ -4,7 +4,7 @@
 #include "yuarel.h"
 
 /**
- * Parse a non nukk terminated string into an integer.
+ * Parse a non null terminated string into an integer.
  *
  * str: pointer to the string containing the number.
  * len: Number of characters to parse.
