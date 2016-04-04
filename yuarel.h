@@ -24,9 +24,9 @@ struct yuarel {
  *
  * scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]
  *
- * The following parts will be parsed to the coresponding struct member.
+ * The following parts will be parsed to the corresponding struct member.
  *
- * *url is:  a pointer to the struct where to store the parsed values.
+ * *url:     a pointer to the struct where to store the parsed values.
  * *url_str: a pointer to the url to be parsed (null terminated).
  *
  * Returns 0 on success, otherwise -1.
