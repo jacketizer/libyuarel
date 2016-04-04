@@ -1,6 +1,20 @@
 # libyuarel
 
-Simple C library for parsing URLs with zero-copy and no mallocs.
+Simple C library for parsing URLs with zero-copy and no mallocs. The library
+does not do any validation on the URL, neither before nor after it is parsed.
+The different parts are parsed by searching for special characters like `:`
+and `/`. For a URL should be able to be parsed by yuarel, it has to be
+constructed like this:
+
+`scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]`
+
+Parts within `[` and `]` are optional. A minimal URL could look like this:
+
+`proto:hostname`
+
+Due to the fact that the library isn't copying any strings and instead points
+to the parts in the URL string, the first `/` in the path will be used as a
+null terminator. Therefore, the first slash will be missing in the path.
 
 ## To build
 
@@ -24,4 +38,36 @@ $ ./simple
 
 ## How to use it:
 
-See example in `examples/simple.c`. Compile with `-lyuarel`.
+Compile with `-lyuarel`.
+
+```C
+#include <stdlib.h>
+#include <stdio.h>
+#include <yuarel.h>
+
+int main(void)
+{
+	struct yuarel url;
+	char *parts[3];
+	char url_string[] = "http://localhost:8989/path/to/test?query=yes";
+
+	if (-1 == yuarel_parse(&url, url_string)) {
+		fprintf(stderr, "Could not parse url!\n");
+		return 1;
+	}
+
+	printf("scheme:\t%s\n", url.scheme);
+	printf("host:\t%s\n", url.host);
+	printf("port:\t%d\n", url.port);
+	printf("path:\t%s\n", url.path);
+	printf("query:\t%s\n", url.query);
+
+	if (3 != yuarel_split_path(url.path, parts, 3)) {
+		fprintf(stderr, "Could not split path!\n");
+		return 1;
+	}
+
+	printf("path parts: %s, %s, %s\n", parts[0], parts[1], parts[2]);
+}
+
+```

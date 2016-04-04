@@ -4,7 +4,7 @@
 #include "yuarel.h"
 
 /**
- * Parse a non NULL terminated string into an integer.
+ * Parse a non nukk terminated string into an integer.
  *
  * str: pointer to the string containing the number.
  * len: Number of characters to parse.
@@ -90,7 +90,7 @@ yuarel_parse(struct yuarel *url, char *u)
 /**
  * Split a path into several strings.
  *
- * No data is copied, the slashed are used as NULL terminators and then
+ * No data is copied, the slashed are used as null terminators and then
  * pointers to each path part will be stored in **parts.
  *
  * *path:     the path to split.
