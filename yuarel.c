@@ -64,7 +64,7 @@ yuarel_parse(struct yuarel *url, char *u)
 
 	/* (Path) */
 	u = strchr(url->host, '/');
-	if (NULL != u && u < url->query) {
+	if (NULL != u && (!url->query || u < url->query)) {
 		*(u++) = '\0';
 		url->path = u;
 	}

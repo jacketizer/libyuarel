@@ -19,7 +19,7 @@ yuarel: $(SRC_FILES) $(OBJ_FILES)
 
 .PHONY: install
 install: all
-	install --directory ${PREFIX}/lib
+	install --directory ${PREFIX}/lib ${PREFIX}/include
 	install libyuarel.so ${PREFIX}/lib/
 	install yuarel.h ${PREFIX}/include/
 	ldconfig -n ${PREFIX}/lib
@@ -28,9 +28,20 @@ install: all
 examples: examples/simple.c
 	$(CC) examples/simple.c -lyuarel -o simple
 
+.PHONY: check
+check:
+	@mkdir -p build
+	@PREFIX=build make install
+	@export LIBRARY_PATH="build/lib";
+	@export LD_LIBRARY_PATH="build/lib";
+	@export C_INCLUDE_PATH="build/include";
+	$(CC) tests/test_lib.c -lyuarel -o test_lib && ./test_lib
+
 .PHONY: clean
 clean:
 	rm -f *.o
+	rm -fr build
+	rm -f simple test_lib
 
 .PHONY: dist-clean
 dist-clean: clean
