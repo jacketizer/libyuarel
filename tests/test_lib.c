@@ -57,6 +57,39 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
 	free(url_string);
 
+	/* With port and path */
+	url_string = strdup("http://example.com:8080/port/and/path");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with port and path", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the port attribute correctly", 8080 == url.port);
+	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "port/and/path"));
+	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	free(url_string);
+
+	/* With port and query */
+	url_string = strdup("http://example.com:8080?query=portANDquery");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with port and query", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the port attribute correctly", 8080 == url.port);
+	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "query=portANDquery"));
+	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
+	free(url_string);
+
+	/* With path and query */
+	url_string = strdup("http://example.com/path/and/query?q=yes");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with path and query", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "path/and/query"));
+	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "q=yes"));
+	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
+	free(url_string);
+
 	/* Full URL */
 	url_string = strdup("https://localhost:8989/path/to/test?query=yes&q=jack");
 	rc = yuarel_parse(&url, url_string);
