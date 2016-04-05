@@ -41,7 +41,7 @@ yuarel_parse(struct yuarel *url, char *u)
 	/* Scheme */
 	url->scheme = u;
 	u = strchr(u, ':');
-	if (NULL == u) {
+	if (NULL == u || url->scheme == u) {
 		return -1;
 	}
 	*(u++) = '\0'; // Replace ':' with NULL
@@ -82,6 +82,11 @@ yuarel_parse(struct yuarel *url, char *u)
 		} else {
 			url->port = atoi(u);
 		}
+	}
+
+	/* Check that host is not empty */
+	if ('\0' == *(url->host)) {
+		return -1;
 	}
 
 	return 0;

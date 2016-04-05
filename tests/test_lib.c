@@ -24,10 +24,21 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
 	free(url_string);
 
+	/* With path (/) */
+	url_string = strdup("http://example.com/");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with path ('/')", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, ""));
+	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
+	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	free(url_string);
+
 	/* With path */
 	url_string = strdup("http://example.com/path");
 	rc = yuarel_parse(&url, url_string);
-	mu_assert("with path", -1 != rc);
+	mu_assert("with path ('/path')", -1 != rc);
 	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
 	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
 	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "path"));
@@ -139,6 +150,18 @@ test_parse_url_fail()
 	url_string = strdup("?query=only");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("query only should return -1", -1 == rc);
+	free(url_string);
+
+	/* Missing scheme */
+	url_string = strdup("://");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("missing scheme should return -1", -1 == rc);
+	free(url_string);
+
+	/* Missing hostname */
+	url_string = strdup("rtsp://:8910/path");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("missing hostname should return -1", -1 == rc);
 	free(url_string);
 
 	return 0;

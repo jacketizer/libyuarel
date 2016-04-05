@@ -32,10 +32,10 @@ examples: examples/simple.c
 check:
 	@mkdir -p build
 	@PREFIX=build make install
-	@export LIBRARY_PATH="build/lib";
-	@export LD_LIBRARY_PATH="build/lib";
-	@export C_INCLUDE_PATH="build/include";
-	$(CC) tests/test_lib.c -lyuarel -o test_lib && ./test_lib
+	LIBRARY_PATH="build/lib" \
+	LD_LIBRARY_PATH="build/lib" \
+	C_INCLUDE_PATH="build/include" \
+	$(CC) tests/test_lib.c -lyuarel -o test_lib && ldd test_lib && ./test_lib
 
 .PHONY: clean
 clean:
