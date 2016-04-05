@@ -105,10 +105,53 @@ test_parse_http_url_ok()
 }
 
 static unsigned char *
+test_parse_url_fail()
+{
+	int rc;
+	struct yuarel url;
+	char *url_string;
+
+	/* Empty */
+	url_string = strdup("");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("empty string should return -1", -1 == rc);
+	free(url_string);
+
+	/* Scheme only */
+	url_string = strdup("rtsp://");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("scheme only should return -1", -1 == rc);
+	free(url_string);
+
+	/* Hostname only */
+	url_string = strdup("hostname");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("hostname only should return -1", -1 == rc);
+	free(url_string);
+
+	/* Path only */
+	url_string = strdup("/path/only");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("path only should return -1", -1 == rc);
+	free(url_string);
+
+	/* Query only */
+	url_string = strdup("?query=only");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("query only should return -1", -1 == rc);
+	free(url_string);
+
+	return 0;
+}
+
+static unsigned char *
 all_tests()
 {
 	mu_group("yuarel_parse() with an HTTP URL");
 	mu_run_test(test_parse_http_url_ok);
+
+	mu_group("yuarel_parse() with faulty values");
+	mu_run_test(test_parse_url_fail);
 
 	return 0;
 }
