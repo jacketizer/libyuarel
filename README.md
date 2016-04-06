@@ -19,7 +19,7 @@ a null terminator. Therefore, the first slash will be missing in the path.
 ## To build
 
 ```sh
-$ make && sudo make install
+$ make && make check && sudo make install
 ```
 
 ## Try it

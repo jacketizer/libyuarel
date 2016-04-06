@@ -35,7 +35,11 @@ check:
 	LIBRARY_PATH="build/lib" \
 	LD_LIBRARY_PATH="build/lib" \
 	C_INCLUDE_PATH="build/include" \
-	$(CC) tests/test_lib.c -lyuarel -o test_lib && ldd test_lib && ./test_lib
+	$(CC) tests/test_lib.c -lyuarel -o test_lib
+	LIBRARY_PATH="build/lib" \
+	LD_LIBRARY_PATH="build/lib" \
+	C_INCLUDE_PATH="build/include" \
+	./test_lib
 
 .PHONY: clean
 clean:
