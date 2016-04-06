@@ -6,11 +6,11 @@ The different parts are parsed by searching for special characters like `:`
 and `/`. For a URL should be able to be parsed by yuarel, it has to be
 constructed like this:
 
-`scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]`
+`scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]`[ "#" fragment ]
 
 Parts within `[` and `]` are optional. A minimal URL could look like this:
 
-`proto:hostname`
+`a:b`
 
 Due to the fact that the library isn't copying any strings and instead points
 to the parts in the URL string, the first `/` in the path will be replaced with
@@ -80,7 +80,7 @@ int main(void)
 {
 	struct yuarel url;
 	char *parts[3];
-	char url_string[] = "http://localhost:8989/path/to/test?query=yes";
+	char url_string[] = "http://localhost:8989/path/to/test?query=yes#frag=1";
 
 	if (-1 == yuarel_parse(&url, url_string)) {
 		fprintf(stderr, "Could not parse url!\n");
@@ -92,6 +92,7 @@ int main(void)
 	printf("port:\t%d\n", url.port);
 	printf("path:\t%s\n", url.path);
 	printf("query:\t%s\n", url.query);
+	printf("fragment:\t%s\n", url.fragment);
 
 	if (3 != yuarel_split_path(url.path, parts, 3)) {
 		fprintf(stderr, "Could not split path!\n");

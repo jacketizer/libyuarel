@@ -15,6 +15,7 @@ struct yuarel {
 	int port; /* port, default: 0 */
 	char *path; /* path, without leading "/", default: NULL */
 	char *query; /* query, default: NULL */
+	char *fragment; /* fragment, default: NULL */
 };
 
 /**
@@ -22,7 +23,7 @@ struct yuarel {
  *
  * The URL string should be in the following format:
  *
- * scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]
+ * scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
  *
  * The following parts will be parsed to the corresponding struct member.
  *

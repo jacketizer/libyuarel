@@ -55,23 +55,30 @@ yuarel_parse(struct yuarel *url, char *u)
 	}
 	url->host = u;
 
-	/* (Query) */
-	u = strchr(u, '?');
+	/* (Fragment) */
+	u = strchr(u, '#');
 	if (NULL != u) {
+		*(u++) = '\0';
+		url->fragment = u;
+	}
+
+	/* (Query) */
+	u = strchr(url->host, '?');
+	if (NULL != u && (!url->fragment || u < url->fragment)) {
 		*(u++) = '\0';
 		url->query = u;
 	}
 
 	/* (Path) */
 	u = strchr(url->host, '/');
-	if (NULL != u && (!url->query || u < url->query)) {
+	if (NULL != u && (!url->query || u < url->query) && (!url->fragment || u < url->fragment)) {
 		*(u++) = '\0';
 		url->path = u;
 	}
 
 	/* (Port) */
 	u = strchr(url->host, ':');
-	if (NULL != u && (!url->query || u < url->query) && (!url->path || u < url->path)) {
+	if (NULL != u && (!url->query || u < url->query) && (!url->path || u < url->path) && (!url->fragment || u < url->fragment)) {
 		*(u++) = '\0';
 		if ('\0' == *u) {
 			return -1;
