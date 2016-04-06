@@ -31,7 +31,7 @@ examples: examples/simple.c
 .PHONY: check
 check:
 	@mkdir -p build
-	@PREFIX=build make install
+	PREFIX=build make install
 	LIBRARY_PATH="build/lib" \
 	LD_LIBRARY_PATH="build/lib" \
 	C_INCLUDE_PATH="build/include" \

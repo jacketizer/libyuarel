@@ -168,6 +168,53 @@ test_parse_url_fail()
 }
 
 static unsigned char *
+test_split_path_ok()
+{
+	int rc;
+	char *path;
+	char *parts[10];
+
+	/* Simple path */
+	path = strdup("/this/is/a/path");
+	rc = yuarel_split_path(path, parts, 10);
+	mu_assert("should be able to parse a regular path", 4 == rc);
+	mu_silent_assert("first part should be 'this'", 0 == strcmp("this", parts[0]));
+	mu_silent_assert("second part should be 'is'", 0 == strcmp("is", parts[1]));
+	mu_silent_assert("third part should be 'a'", 0 == strcmp("a", parts[2]));
+	mu_silent_assert("fourth part should be 'path'", 0 == strcmp("path", parts[3]));
+	free(path);
+
+	/* Relative path */
+	path = strdup("this/is/a/path");
+	rc = yuarel_split_path(path, parts, 10);
+	mu_assert("should be able to parse a relative path", 4 == rc);
+	mu_silent_assert("first part should be 'this'", 0 == strcmp("this", parts[0]));
+	mu_silent_assert("second part should be 'is'", 0 == strcmp("is", parts[1]));
+	mu_silent_assert("third part should be 'a'", 0 == strcmp("a", parts[2]));
+	mu_silent_assert("fourth part should be 'path'", 0 == strcmp("path", parts[3]));
+	free(path);
+
+	/* Path with empty parts */
+	path = strdup("//this//is/a/path/");
+	rc = yuarel_split_path(path, parts, 10);
+	mu_assert("should treat multiple slashes as one", 4 == rc);
+	mu_silent_assert("first part should be 'this'", 0 == strcmp("this", parts[0]));
+	mu_silent_assert("second part should be 'is'", 0 == strcmp("is", parts[1]));
+	mu_silent_assert("third part should be 'a'", 0 == strcmp("a", parts[2]));
+	mu_silent_assert("fourth part should be 'path'", 0 == strcmp("path", parts[3]));
+	free(path);
+
+	/* Just one level */
+	path = strdup("/one_level");
+	rc = yuarel_split_path(path, parts, 10);
+	mu_assert("should be able to parse a path with one level", 1 == rc);
+	mu_silent_assert("first part should be 'this'", 0 == strcmp("one_level", parts[0]));
+	free(path);
+
+	return 0;
+}
+
+static unsigned char *
 all_tests()
 {
 	mu_group("yuarel_parse() with an HTTP URL");
@@ -175,6 +222,9 @@ all_tests()
 
 	mu_group("yuarel_parse() with faulty values");
 	mu_run_test(test_parse_url_fail);
+
+	mu_group("yuarel_split_path()");
+	mu_run_test(test_split_path_ok);
 
 	return 0;
 }

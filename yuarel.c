@@ -46,7 +46,7 @@ yuarel_parse(struct yuarel *url, char *u)
 	}
 	*(u++) = '\0'; // Replace ':' with NULL
 
-	/* Rewind to after // */
+	/* Forward to after // */
 	while ('/' == *u) u++;
 
 	/* Host */
@@ -96,7 +96,8 @@ yuarel_parse(struct yuarel *url, char *u)
  * Split a path into several strings.
  *
  * No data is copied, the slashed are used as null terminators and then
- * pointers to each path part will be stored in **parts.
+ * pointers to each path part will be stored in **parts. Double slashes will be
+ * treated as one.
  *
  * *path:     the path to split.
  * **parts:   a pointer to an array of (char *) where to store the result.
@@ -107,15 +108,22 @@ yuarel_split_path(char *path, char **parts, int max_parts)
 {
 	int i = 0;
 
-	/* Rewind to after slashes */
-	while ('/' == *path) path++;
+	do {
+		/* Forward to after slashes */
+		while ('/' == *path) path++;
 
-	parts[i++] = path;
+		if ('\0' == *path) {
+			break;
+		}
 
-	while (i < max_parts && (path = strchr(path, '/')) != NULL) {
-		*path = '\0';
-		parts[i++] = ++path;
-	}
+		parts[i++] = path;
+
+		if ((path = strchr(path, '/')) == NULL) {
+			break;
+		}
+
+		*(path++) = '\0';
+	} while (i < max_parts);
 
 	return i;
 }

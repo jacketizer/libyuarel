@@ -37,7 +37,8 @@ extern int yuarel_parse(struct yuarel *url, char *url_str);
  * Split a path into several strings.
  *
  * No data is copied, the slashed are used as null terminators and then
- * pointers to each path part will be stored in **parts.
+ * pointers to each path part will be stored in **parts. Double slashes will be
+ * treated as one.
  *
  * *path:     the path to split.
  * **parts:   a pointer to an array of (char *) where to store the result.
