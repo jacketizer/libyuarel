@@ -22,6 +22,7 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
 	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
 	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
 	free(url_string);
 
 	/* With path (/) */
@@ -33,6 +34,7 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, ""));
 	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
 	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
 	free(url_string);
 
 	/* With path */
@@ -44,6 +46,7 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "path"));
 	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
 	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
 	free(url_string);
 
 	/* With port */
@@ -55,6 +58,7 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the port attribute correctly", 80 == url.port);
 	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
 	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
 	free(url_string);
 
 	/* With query */
@@ -66,6 +70,19 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "query=only"));
 	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
 	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
+	free(url_string);
+
+	/* With fragment */
+	url_string = strdup("http://example.com#frag=f1");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with fragment only", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp(url.fragment, "frag=f1"));
+	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
+	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
+	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
 	free(url_string);
 
 	/* With port and path */
@@ -77,6 +94,7 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the port attribute correctly", 8080 == url.port);
 	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "port/and/path"));
 	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
 	free(url_string);
 
 	/* With port and query */
@@ -88,6 +106,19 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the port attribute correctly", 8080 == url.port);
 	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "query=portANDquery"));
 	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
+	free(url_string);
+
+	/* With port and fragment */
+	url_string = strdup("http://example.com:8080#f1");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with port and fragment", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the port attribute correctly", 8080 == url.port);
+	mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp(url.fragment, "f1"));
+	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
+	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
 	free(url_string);
 
 	/* With path and query */
@@ -99,10 +130,35 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "path/and/query"));
 	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "q=yes"));
 	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
+	mu_silent_assert("should set the fragment attribute correctly", NULL == url.fragment);
+	free(url_string);
+
+	/* With path and fragment */
+	url_string = strdup("http://example.com/path/and#fragment");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with path and fragment", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "path/and"));
+	mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp(url.fragment, "fragment"));
+	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
+	mu_silent_assert("should set the query attribute correctly", NULL == url.query);
+	free(url_string);
+
+	/* With query and fragment */
+	url_string = strdup("http://example.com?q=yes#f1");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with query and fragment", -1 != rc);
+	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "http"));
+	mu_silent_assert("should set the host attribute correctly", 0 == strcmp(url.host, "example.com"));
+	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "q=yes"));
+	mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp(url.fragment, "f1"));
+	mu_silent_assert("should set the port attribute correctly", 0 == url.port);
+	mu_silent_assert("should set the path attribute correctly", NULL == url.path);
 	free(url_string);
 
 	/* Full URL */
-	url_string = strdup("https://localhost:8989/path/to/test?query=yes&q=jack");
+	url_string = strdup("https://localhost:8989/path/to/test?query=yes&q=jack#fragment1");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("with port, path and query", -1 != rc);
 	mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp(url.scheme, "https"));
@@ -110,6 +166,7 @@ test_parse_http_url_ok()
 	mu_silent_assert("should set the port attribute correctly", 8989 == url.port);
 	mu_silent_assert("should set the path attribute correctly", 0 == strcmp(url.path, "path/to/test"));
 	mu_silent_assert("should set the query attribute correctly", 0 == strcmp(url.query, "query=yes&q=jack"));
+	mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp(url.fragment, "fragment1"));
 	free(url_string);
 
 	return 0;
