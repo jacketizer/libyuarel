@@ -36,6 +36,19 @@ Run the example program:
 $ ./simple
 ```
 
+## The struct
+
+```C
+struct yuarel {
+	char *scheme;	/* scheme, without ":" and "//" */
+	char *host;	/* hostname or IP address */
+	int port;	/* port, default: 0 */
+	char *path;	/* path, without leading "/", default: NULL */
+	char *query; 	/* query, default: NULL */
+	char *fragment;	/* fragment, default: NULL */
+};
+```
+
 ## Library functions
 
 ### Parse a URL to a struct
