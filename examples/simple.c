@@ -6,7 +6,8 @@ int main(void)
 {
 	struct yuarel url;
 	char *parts[3];
-	char url_string[] = "http://localhost:8989/path/to/test?query=yes#frag=1";
+	char *params[3];
+	char url_string[] = "http://localhost:8989/path/to/test?query=yes&param1=no#frag=1";
 
 	if (-1 == yuarel_parse(&url, url_string)) {
 		fprintf(stderr, "Could not parse url!\n");
@@ -25,5 +26,10 @@ int main(void)
 		return 1;
 	}
 
-	printf("path parts: %s, %s, %s\n", parts[0], parts[1], parts[2]);
+	printf("path parts: '%s', '%s', '%s'\n", parts[0], parts[1], parts[2]);
+
+	int p = yuarel_tokenize_query(url.query, '&', params, 3);
+	while (p-- > 0) {
+		printf("param[%d]: %s\n", p, params[p]);
+	}
 }

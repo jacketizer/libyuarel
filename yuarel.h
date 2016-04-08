@@ -49,4 +49,20 @@ extern int yuarel_parse(struct yuarel *url, char *url_str);
  */
 extern int yuarel_split_path(char *path, char **parts, int max_parts);
 
+/**
+ * Parse a query string into a key/value struct.
+ *
+ * No data is copied, the equal sign and delimiters are used as null
+ * terminators and then pointers to each parameter key and value will be stored
+ * in *values.
+ *
+ * *query:     the query string to parse.
+ * delimiter   the character that seperates the key/value pairs from eachother.
+ * **params:   a pointer to an array of (char *) where to store the result.
+ * max_values: max number of parameters to parse.
+ *
+ * Returns the number of parsed items. -1 on error.
+ */
+extern int yuarel_tokenize_query(char *query, char delimiter, char **params, int max_params);
+
 #endif /* INC_YUAREL_H */

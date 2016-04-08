@@ -134,3 +134,21 @@ yuarel_split_path(char *path, char **parts, int max_parts)
 
 	return i;
 }
+
+int
+yuarel_tokenize_query(char *query, char delimiter, char **params, int max_params)
+{
+	int i = 0;
+
+	if (NULL == query || '\0' == *query) {
+		return -1;
+	}
+
+	params[i++] = query;
+	while (i < max_params && NULL != (query = strchr(query, delimiter))) {
+		*query = '\0';
+		params[i++] = ++query;
+	}
+
+	return i;
+}
