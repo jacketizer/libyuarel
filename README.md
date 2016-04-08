@@ -1,10 +1,13 @@
-# libyuarel
+libyuarel
+=========
 
-Simple C library for parsing URLs with zero-copy and no mallocs. The library
-does not do any validation on the URL, neither before nor after it is parsed.
-The different parts are parsed by searching for special characters like `:`
-and `/`. For a URL should be able to be parsed by yuarel, it has to be
-constructed like this:
+[![Build Status](https://travis-ci.org/jacketizer/libyuarel.svg?branch=master)](https://travis-ci.org/jacketizer/libyuarel)
+
+Very simple and well tested C library for parsing URLs with zero-copy and no
+mallocs. The library does not do any validation on the URL, neither before nor
+after it is parsed. The different parts are parsed by searching for special
+characters like `:` and `/`. For a URL should be able to be parsed by yuarel,
+it has to be constructed like this:
 
 `scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]`[ "#" fragment ]
 
