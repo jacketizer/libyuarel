@@ -136,7 +136,7 @@ yuarel_split_path(char *path, char **parts, int max_parts)
 }
 
 int
-yuarel_tokenize_query(char *query, char delimiter, char **params, int max_params)
+yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
 {
 	int i = 0;
 
@@ -144,10 +144,24 @@ yuarel_tokenize_query(char *query, char delimiter, char **params, int max_params
 		return -1;
 	}
 
-	params[i++] = query;
+	params[i++].key = query;
 	while (i < max_params && NULL != (query = strchr(query, delimiter))) {
 		*query = '\0';
-		params[i++] = ++query;
+		params[i].key = ++query;
+		params[i].val = NULL;
+
+		/* Go back and split previous param */
+		if (i > 0) {
+			if (NULL != (params[i - 1].val = strchr(params[i - 1].key, '='))) {
+				*(params[i - 1].val)++ = '\0';
+			}
+		}
+		i++;
+	}
+
+	/* Go back and split last param */
+	if (NULL != (params[i - 1].val = strchr(params[i - 1].key, '='))) {
+		*(params[i - 1].val)++ = '\0';
 	}
 
 	return i;

@@ -18,6 +18,12 @@ struct yuarel {
 	char *fragment; /* fragment, default: NULL */
 };
 
+/* A struct to hold the query string parameter values. */
+struct yuarel_param {
+	char *key;
+	char *val;
+};
+
 /**
  * Parse a URL to a struct.
  *
@@ -54,15 +60,15 @@ extern int yuarel_split_path(char *path, char **parts, int max_parts);
  *
  * No data is copied, the equal sign and delimiters are used as null
  * terminators and then pointers to each parameter key and value will be stored
- * in *values.
+ * in *params.
  *
  * *query:     the query string to parse.
- * delimiter   the character that seperates the key/value pairs from eachother.
- * **params:   a pointer to an array of (char *) where to store the result.
+ * delimiter:  the character that seperates the key/value pairs from eachother.
+ * *params:    an array of (struct yuarel_param) where to store the result.
  * max_values: max number of parameters to parse.
  *
  * Returns the number of parsed items. -1 on error.
  */
-extern int yuarel_tokenize_query(char *query, char delimiter, char **params, int max_params);
+extern int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params);
 
 #endif /* INC_YUAREL_H */

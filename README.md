@@ -39,7 +39,9 @@ Run the example program:
 $ ./simple
 ```
 
-## The struct
+## The structs
+
+The struct that holds the parsed URL looks like this:
 
 ```C
 struct yuarel {
@@ -49,6 +51,15 @@ struct yuarel {
 	char *path;	/* path, without leading "/", default: NULL */
 	char *query; 	/* query, default: NULL */
 	char *fragment;	/* fragment, default: NULL */
+};
+```
+
+The struct that holds a parsed query string parameter looks like this:
+
+```C
+struct yuarel_param {
+	char *key;
+	char *val;
 };
 ```
 
@@ -80,6 +91,19 @@ pointers to each path part will be stored in `parts`.
 `char **parts`: a pointer to an array of `(char *)` where to store the result.
 
 `int max_parts`: max number of parts to parse.
+
+Returns the number of parsed items. -1 on error.
+
+### Parse a query string
+
+```C
+int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
+```
+
+`char *query`: the query string to parse.
+`char delimiter`: the character that seperates the key/value pairs from eachother.
+`struct yuarel_param *params`: an array of `(struct yuarel_param)` where to store the result.
+`int max_values`: max number of parameters to parse.
 
 Returns the number of parsed items. -1 on error.
 
