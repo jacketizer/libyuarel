@@ -68,7 +68,7 @@ extern int yuarel_split_path(char *path, char **parts, int max_parts);
  * in the yuarel_param struct.
  *
  * *query:     the query string to parse.
- * delimiter:  the character that seperates the key/value pairs from eachother.
+ * delimiter:  the character that separates the key/value pairs from eachother.
  * *params:    an array of (struct yuarel_param) where to store the result.
  * max_values: max number of parameters to parse.
  *
