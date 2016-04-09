@@ -9,7 +9,7 @@ after it is parsed. The different parts are parsed by searching for special
 characters like `:` and `/`. For a URL should be able to be parsed by yuarel,
 it has to be constructed like this:
 
-`scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]`[ "#" fragment ]
+`scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]`
 
 Parts within `[` and `]` are optional. A minimal URL could look like this:
 
