@@ -58,9 +58,14 @@ extern int yuarel_split_path(char *path, char **parts, int max_parts);
 /**
  * Parse a query string into a key/value struct.
  *
- * No data is copied, the equal sign and delimiters are used as null
+ * The query string should be a null terminated string of parameters separated by
+ * a delimiter. Each parameter are checked for the equal sign character. If it
+ * appears in the parameter, it will be used as a null terminator and the part
+ * that comes after it will be the value of the parameter.
+ *
+ * No data are copied, the equal sign and delimiters are used as null
  * terminators and then pointers to each parameter key and value will be stored
- * in *params.
+ * in the yuarel_param struct.
  *
  * *query:     the query string to parse.
  * delimiter:  the character that seperates the key/value pairs from eachother.

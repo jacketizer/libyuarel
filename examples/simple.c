@@ -4,6 +4,7 @@
 
 int main(void)
 {
+	int p;
 	struct yuarel url;
 	char *parts[3];
 	struct yuarel_param params[3];
@@ -29,8 +30,9 @@ int main(void)
 
 	printf("\nPath parts: '%s', '%s', '%s'\n\n", parts[0], parts[1], parts[2]);
 
-	int p = yuarel_parse_query(url.query, '&', params, 3);
 	printf("Query string parameters:\n");
+
+	p = yuarel_parse_query(url.query, '&', params, 3);
 	while (p-- > 0) {
 		printf("\t%s: %s\n", params[p].key, params[p].val);
 	}

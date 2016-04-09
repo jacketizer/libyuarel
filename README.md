@@ -72,7 +72,6 @@ int yuarel_parse(struct yuarel *url, char *url_str)
 ```
 
 `struct yuarel *url`: a pointer to the struct where to store the parsed values.
-
 `char *url_str`: a pointer to the url to be parsed (null terminated).
 
 Returns 0 on success, otherwise -1.
@@ -87,9 +86,7 @@ No data is copied, the slashed are used as null terminators and then
 pointers to each path part will be stored in `parts`.
 
 `char *path`: the path to split.
-
 `char **parts`: a pointer to an array of `(char *)` where to store the result.
-
 `int max_parts`: max number of parts to parse.
 
 Returns the number of parsed items. -1 on error.
@@ -105,6 +102,15 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
 `struct yuarel_param *params`: an array of `(struct yuarel_param)` where to store the result.
 `int max_values`: max number of parameters to parse.
 
+The query string should be a null terminated string of parameters separated by
+a delimiter. Each parameter are checked for the equal sign character. If it
+appears in the parameter, it will be used as a null terminator and the part
+that comes after it will be the value of the parameter.
+
+No data are copied, the equal sign and delimiters are used as null
+terminators and then pointers to each parameter key and value will be stored
+in the yuarel_param struct.
+
 Returns the number of parsed items. -1 on error.
 
 ## How to use it:
@@ -118,6 +124,7 @@ Compile with `-lyuarel`.
 
 int main(void)
 {
+	int p;
 	struct yuarel url;
 	char *parts[3];
 	char url_string[] = "http://localhost:8989/path/to/test?query=yes#frag=1";
@@ -140,6 +147,13 @@ int main(void)
 	}
 
 	printf("path parts: %s, %s, %s\n", parts[0], parts[1], parts[2]);
+
+	printf("Query string parameters:\n");
+
+	p = yuarel_parse_query(url.query, '&', params, 3);
+	while (p-- > 0) {
+		printf("\t%s: %s\n", params[p].key, params[p].val);
+	}
 }
 
 ```
