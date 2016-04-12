@@ -231,6 +231,74 @@ test_split_path_ok()
 }
 
 static unsigned char *
+test_parse_query_ok()
+{
+	int rc;
+	char *q;
+	struct yuarel_param params[10];
+
+	/* One param query */
+	q = strdup("q=yes");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("single parameter with value", 1 == rc);
+	mu_silent_assert("first param key should be 'q'", 0 == strcmp("q", params[0].key));
+	mu_silent_assert("first param val should be 'yes'", 0 == strcmp("yes", params[0].val));
+	free(q);
+
+	/* One param query without value */
+	q = strdup("q");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("single parameter without value", 1 == rc);
+	mu_silent_assert("first param key should be 'q'", 0 == strcmp("q", params[0].key));
+	mu_silent_assert("first param val should be NULL", NULL == params[0].val);
+	free(q);
+
+	/* Two param query */
+	q = strdup("query=yes&a1=hello");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("multiple params with value", 2 == rc);
+	mu_silent_assert("first param key should be 'query'", 0 == strcmp("query", params[0].key));
+	mu_silent_assert("first param val should be 'yes'", 0 == strcmp("yes", params[0].val));
+	mu_silent_assert("second param key should be 'a1'", 0 == strcmp("a1", params[1].key));
+	mu_silent_assert("second param val should be 'hello'", 0 == strcmp("hello", params[1].val));
+	free(q);
+
+	/* Two param query, one without value */
+	q = strdup("query=yes&forceHttps");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("multiple params one without value", 2 == rc);
+	mu_silent_assert("first param key should be 'query'", 0 == strcmp("query", params[0].key));
+	mu_silent_assert("first param val should be 'yes'", 0 == strcmp("yes", params[0].val));
+	mu_silent_assert("second param key should be 'forceHttps'", 0 == strcmp("forceHttps", params[1].key));
+	mu_silent_assert("second param val should be NULL", NULL == params[1].val);
+	free(q);
+
+	/* Three param query, all without value */
+	q = strdup("query&forceHttps&log");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("multiple params all without value", 3 == rc);
+	mu_silent_assert("first param key should be 'query'", 0 == strcmp("query", params[0].key));
+	mu_silent_assert("first param val should be NULL", NULL == params[0].val);
+	mu_silent_assert("second param key should be 'forceHttps'", 0 == strcmp("forceHttps", params[1].key));
+	mu_silent_assert("second param val should be NULL", NULL == params[1].val);
+	mu_silent_assert("third param key should be 'log'", 0 == strcmp("log", params[2].key));
+	mu_silent_assert("third param val should be NULL", NULL == params[2].val);
+	free(q);
+
+	/* Param with empty value */
+	q = strdup("param=&query=no");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("", 2 == rc);
+	mu_silent_assert("first param key should be 'param'", 0 == strcmp("param", params[0].key));
+	mu_silent_assert("first param val should be ''", 0 == strcmp("", params[0].val));
+	mu_silent_assert("second param key should be 'query'", 0 == strcmp("query", params[1].key));
+	mu_silent_assert("second param val should be 'no'", 0 == strcmp("no", params[1].val));
+	free(q);
+
+	return 0;
+}
+
+static unsigned char *
 all_tests()
 {
 	mu_group("yuarel_parse() with an HTTP URL");
@@ -241,6 +309,9 @@ all_tests()
 
 	mu_group("yuarel_split_path()");
 	mu_run_test(test_split_path_ok);
+
+	mu_group("yuarel_parse_query()");
+	mu_run_test(test_parse_query_ok);
 
 	return 0;
 }
