@@ -288,11 +288,47 @@ test_parse_query_ok()
 	/* Param with empty value */
 	q = strdup("param=&query=no");
 	rc = yuarel_parse_query(q, '&', params, 10);
-	mu_assert("", 2 == rc);
+	mu_assert("param with empty value", 2 == rc);
 	mu_silent_assert("first param key should be 'param'", 0 == strcmp("param", params[0].key));
 	mu_silent_assert("first param val should be ''", 0 == strcmp("", params[0].val));
 	mu_silent_assert("second param key should be 'query'", 0 == strcmp("query", params[1].key));
 	mu_silent_assert("second param val should be 'no'", 0 == strcmp("no", params[1].val));
+	free(q);
+
+	/* Double delimiter */
+	q = strdup("param=jack&&query=no");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("double delimiter", 3 == rc);
+	mu_silent_assert("first param key should be 'param'", 0 == strcmp("param", params[0].key));
+	mu_silent_assert("first param val should be 'jack'", 0 == strcmp("jack", params[0].val));
+	mu_silent_assert("second param key should be ''", 0 == strcmp("", params[1].key));
+	mu_silent_assert("second param val should be NULL", NULL == params[1].val);
+	mu_silent_assert("third param key should be 'query'", 0 == strcmp("query", params[2].key));
+	mu_silent_assert("third param val should be 'no'", 0 == strcmp("no", params[2].val));
+	free(q);
+
+	/* Delimiter in beginning */
+	q = strdup("&param=jack&query=no");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("delimiter in beginning", 3 == rc);
+	mu_silent_assert("first param key should be ''", 0 == strcmp("", params[0].key));
+	mu_silent_assert("first param val should be NULL", NULL == params[0].val);
+	mu_silent_assert("second param key should be 'param'", 0 == strcmp("param", params[1].key));
+	mu_silent_assert("second param val should be 'jack'", 0 == strcmp("jack", params[1].val));
+	mu_silent_assert("third param key should be 'query'", 0 == strcmp("query", params[2].key));
+	mu_silent_assert("third param val should be 'no'", 0 == strcmp("no", params[2].val));
+	free(q);
+
+	/* Delimiter at the end */
+	q = strdup("param=jack&query=no&");
+	rc = yuarel_parse_query(q, '&', params, 10);
+	mu_assert("delimiter at the end", 3 == rc);
+	mu_silent_assert("first param key should be 'param'", 0 == strcmp("param", params[0].key));
+	mu_silent_assert("first param val should be 'jack'", 0 == strcmp("jack", params[0].val));
+	mu_silent_assert("second param key should be 'query'", 0 == strcmp("query", params[1].key));
+	mu_silent_assert("second param val should be 'no'", 0 == strcmp("no", params[1].val));
+	mu_silent_assert("third param key should be ''", 0 == strcmp("", params[2].key));
+	mu_silent_assert("third param val should be NULL", NULL == params[2].val);
 	free(q);
 
 	return 0;
