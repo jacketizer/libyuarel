@@ -27,7 +27,7 @@ yuarel: $(SRC_FILES) $(OBJ_FILES)
 install: all
 	install --directory $(PREFIX)/lib $(PREFIX)/include
 	install lib$(LIBNAME).so.$(VERSION_MAJOR) $(PREFIX)/lib/
-	ln -s $(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR) $(PREFIX)/lib/lib$(LIBNAME).so
+	ln -fs $(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR) $(PREFIX)/lib/lib$(LIBNAME).so
 	install yuarel.h $(PREFIX)/include/
 	ldconfig -n $(PREFIX)/lib
 
