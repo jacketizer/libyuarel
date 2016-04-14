@@ -1,3 +1,4 @@
+CUR_DIR = $(shell pwd)
 SRC_FILES = yuarel.c
 OBJ_FILES = $(patsubst %.c, %.o, $(SRC_FILES))
 
@@ -38,8 +39,8 @@ examples: examples/simple.c
 .PHONY: check
 check:
 	@mkdir -p build
-	PREFIX=build make install
-	$(CC) tests/test_lib.c -l$(LIBNAME) -Ibuild/include -Lbuild/lib -o test_lib
+	PREFIX=$(CUR_DIR)/build make install
+	$(CC) tests/test_lib.c -Ibuild/include -Lbuild/lib -l$(LIBNAME) -o test_lib
 	LD_LIBRARY_PATH="build/lib" \
 	./test_lib
 
