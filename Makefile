@@ -39,13 +39,8 @@ examples: examples/simple.c
 check:
 	@mkdir -p build
 	PREFIX=build make install
-	LIBRARY_PATH="build/lib" \
+	$(CC) tests/test_lib.c -l$(LIBNAME) -Ibuild/include -Lbuild/lib -o test_lib
 	LD_LIBRARY_PATH="build/lib" \
-	C_INCLUDE_PATH="build/include" \
-	$(CC) tests/test_lib.c -l$(LIBNAME) -o test_lib
-	LIBRARY_PATH="build/lib" \
-	LD_LIBRARY_PATH="build/lib" \
-	C_INCLUDE_PATH="build/include" \
 	./test_lib
 
 .PHONY: dist
