@@ -63,4 +63,5 @@ clean:
 .PHONY: dist-clean
 dist-clean: clean
 	rm -f libyuarel.so.*
-	rm -rf dist
+	rm -rf $(PKG_NAME)
+	rm -f $(PKG_NAME).tar.gz
