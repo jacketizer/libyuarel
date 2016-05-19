@@ -7,13 +7,17 @@ Very simple and well tested C library for parsing URLs with zero-copy and no
 mallocs. The library does not do any validation on the URL, neither before nor
 after it is parsed. The different parts are parsed by searching for special
 characters like `:` and `/`. For a URL should be able to be parsed by yuarel,
-it has to be constructed like this:
+it has to be constructed in one of the following formats:
 
-`scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]`
+*Absolute URL:*
+scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
+
+*Relative URL:*
+path [ "?" query ] [ "#" fragment ]
 
 Parts within `[` and `]` are optional. A minimal URL could look like this:
 
-`a:b`
+`a:b` or `/`
 
 Due to the fact that the library isn't copying any strings and instead points
 to the parts in the URL string, the first `/` in the path will be replaced with

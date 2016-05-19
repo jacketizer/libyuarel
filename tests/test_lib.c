@@ -15,7 +15,7 @@ strcmp_wrap(const char *str, const char *str2)
 	if (NULL == str) {
 		return 1;
 	}
-	if (NULL == str) {
+	if (NULL == str2) {
 		return -1;
 	}
 
@@ -132,6 +132,51 @@ test_parse_http_url_ok()
 }
 
 static unsigned char *
+test_parse_http_rel_url_ok()
+{
+	int rc;
+	struct yuarel url;
+	char *url_string;
+
+	/* Minimal relative URL */
+	url_string = strdup("/");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("minimal relative URL", -1 != rc);
+	assert_struct(url, NULL, NULL, 0, "", NULL, NULL);
+	free(url_string);
+
+	/* Path only */
+	url_string = strdup("/hejsan");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("path only", -1 != rc);
+	assert_struct(url, NULL, NULL, 0, "hejsan", NULL, NULL);
+	free(url_string);
+
+	/* Path and query */
+	url_string = strdup("/hejsan?q=yes");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("path only", -1 != rc);
+	assert_struct(url, NULL, NULL, 0, "hejsan", "q=yes", NULL);
+	free(url_string);
+
+	/* Path and fragment */
+	url_string = strdup("/hejsan#fragment");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("path and fragment", -1 != rc);
+	assert_struct(url, NULL, NULL, 0, "hejsan", NULL, "fragment");
+	free(url_string);
+
+	/* Path, query and fragment */
+	url_string = strdup("/?q=yes&q2=no#fragment");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("path, query and fragment", -1 != rc);
+	assert_struct(url, NULL, NULL, 0, "", "q=yes&q2=no", "fragment");
+	free(url_string);
+
+	return 0;
+}
+
+static unsigned char *
 test_parse_url_fail()
 {
 	int rc;
@@ -154,12 +199,6 @@ test_parse_url_fail()
 	url_string = strdup("hostname");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("hostname only should return -1", -1 == rc);
-	free(url_string);
-
-	/* Path only */
-	url_string = strdup("/path/only");
-	rc = yuarel_parse(&url, url_string);
-	mu_assert("path only should return -1", -1 == rc);
 	free(url_string);
 
 	/* Query only */
@@ -339,6 +378,9 @@ all_tests()
 {
 	mu_group("yuarel_parse() with an HTTP URL");
 	mu_run_test(test_parse_http_url_ok);
+
+	mu_group("yuarel_parse() with an relative URL");
+	mu_run_test(test_parse_http_rel_url_ok);
 
 	mu_group("yuarel_parse() with faulty values");
 	mu_run_test(test_parse_url_fail);

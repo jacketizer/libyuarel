@@ -9,6 +9,7 @@ LIBNAME = yuarel
 PKG_NAME = lib$(LIBNAME)-$(VERSION)
 
 CC = gcc
+AR = ar
 CFLAGS = -c -fPIC -g -Wall
 LDFLAGS =-s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
@@ -20,6 +21,7 @@ all: yuarel
 yuarel: $(SRC_FILES) $(OBJ_FILES)
 	@echo "Building $(PKG_NAME)..."
 	$(CC) $(LDFLAGS) $(OBJ_FILES) -o lib$(LIBNAME).so.$(VERSION_MAJOR)
+	$(AR) rcs lib$(LIBNAME).a $(OBJ_FILES)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -27,7 +29,7 @@ yuarel: $(SRC_FILES) $(OBJ_FILES)
 .PHONY: install
 install: all
 	install --directory $(PREFIX)/lib $(PREFIX)/include
-	install lib$(LIBNAME).so.$(VERSION_MAJOR) $(PREFIX)/lib/
+	install lib$(LIBNAME).so.$(VERSION_MAJOR) lib$(LIBNAME).a $(PREFIX)/lib/
 	ln -fs $(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR) $(PREFIX)/lib/lib$(LIBNAME).so
 	install yuarel.h $(PREFIX)/include/
 	ldconfig -n $(PREFIX)/lib

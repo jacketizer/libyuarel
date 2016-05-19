@@ -53,68 +53,76 @@ natoi(char *str, size_t len)
 int
 yuarel_parse(struct yuarel *url, char *u)
 {
+	char *start = u;
+
 	if (NULL == url || NULL == u) {
 		return -1;
 	}
 
 	memset(url, 0, sizeof (struct yuarel));
 
-	/* Scheme */
-	url->scheme = u;
-	u = strchr(u, ':');
-	if (NULL == u || url->scheme == u) {
-		return -1;
-	}
-	*(u++) = '\0'; // Replace ':' with NULL
+	/* relative URL, parse scheme and hostname */
+	if ('/' != *u) {
+		/* Scheme */
+		url->scheme = u;
+		u = strchr(u, ':');
+		if (NULL == u || url->scheme == u) {
+			return -1;
+		}
+		*(u++) = '\0'; // Replace ':' with NULL
 
-	/* Forward to after // */
-	while ('/' == *u) u++;
+		/* Forward to after // */
+		while ('/' == *u) u++;
 
-	/* Host */
-	if ('\0' == *u) {
-		return -1;
-	}
-	url->host = u;
-
-	/* (Fragment) */
-	u = strchr(u, '#');
-	if (NULL != u) {
-		*(u++) = '\0';
-		url->fragment = u;
-	}
-
-	/* (Query) */
-	u = strchr(url->host, '?');
-	if (NULL != u && (!url->fragment || u < url->fragment)) {
-		*(u++) = '\0';
-		url->query = u;
-	}
-
-	/* (Path) */
-	u = strchr(url->host, '/');
-	if (NULL != u && (!url->query || u < url->query) && (!url->fragment || u < url->fragment)) {
-		*(u++) = '\0';
-		url->path = u;
-	}
-
-	/* (Port) */
-	u = strchr(url->host, ':');
-	if (NULL != u && (!url->query || u < url->query) && (!url->path || u < url->path) && (!url->fragment || u < url->fragment)) {
-		*(u++) = '\0';
+		/* Host */
 		if ('\0' == *u) {
 			return -1;
 		}
-
-		if (url->path) {
-			url->port = natoi(u, url->path - u - 1);
-		} else {
-			url->port = atoi(u);
-		}
+		url->host = u;
+		start = u;
 	}
 
-	/* Check that host is not empty */
-	if ('\0' == *(url->host)) {
-		return -1;
+	/* (Fragment) */
+	u = strchr(start, '#');
+	if (NULL != u) {
+		*u = '\0';
+		url->fragment = u + 1;
+	}
+
+	/* (Query) */
+	u = strchr(start, '?');
+	if (NULL != u) {
+		*u = '\0';
+		url->query = u + 1;
+	}
+
+	/* (Path) */
+	u = strchr(start, '/');
+	if (NULL != u) {
+		*u = '\0';
+		url->path = u + 1;
+	}
+
+	/* relative URI, parse port */
+	if (NULL != url->scheme) {
+		/* (Port) */
+		u = strchr(start, ':');
+		if (NULL != u && (NULL == url->path || u < url->path)) {
+			*(u++) = '\0';
+			if ('\0' == *u) {
+				return -1;
+			}
+
+			if (url->path) {
+				url->port = natoi(u, url->path - u - 1);
+			} else {
+				url->port = atoi(u);
+			}
+		}
+		/* Missing hostname */
+		if ('\0' == *url->host) {
+			return -1;
+		}
 	}
 
 	return 0;

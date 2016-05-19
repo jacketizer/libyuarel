@@ -48,9 +48,13 @@ struct yuarel_param {
 /**
  * Parse a URL to a struct.
  *
- * The URL string should be in the following format:
+ * The URL string should be in one of the following formats:
  *
+ * Absolute URL:
  * scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
+ *
+ * Relative URL:
+ * path [ "?" query ] [ "#" fragment ]
  *
  * The following parts will be parsed to the corresponding struct member.
  *
