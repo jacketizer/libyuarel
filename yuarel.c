@@ -55,9 +55,8 @@ yuarel_parse(struct yuarel *url, char *u)
 {
 	char *start = u;
 
-	if (NULL == url || NULL == u) {
+	if (NULL == url || NULL == u)
 		return -1;
-	}
 
 	memset(url, 0, sizeof (struct yuarel));
 
@@ -120,9 +119,8 @@ yuarel_parse(struct yuarel *url, char *u)
 			}
 		}
 		/* Missing hostname */
-		if ('\0' == *url->host) {
+		if ('\0' == *url->host)
 			return -1;
-		}
 	}
 
 	return 0;
@@ -169,9 +167,8 @@ yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int
 {
 	int i = 0;
 
-	if (NULL == query || '\0' == *query) {
+	if (NULL == query || '\0' == *query)
 		return -1;
-	}
 
 	params[i++].key = query;
 	while (i < max_params && NULL != (query = strchr(query, delimiter))) {
@@ -189,9 +186,8 @@ yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int
 	}
 
 	/* Go back and split last param */
-	if (NULL != (params[i - 1].val = strchr(params[i - 1].key, '='))) {
+	if (NULL != (params[i - 1].val = strchr(params[i - 1].key, '=')))
 		*(params[i - 1].val)++ = '\0';
-	}
 
 	return i;
 }
