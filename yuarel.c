@@ -60,7 +60,7 @@ yuarel_parse(struct yuarel *url, char *u)
 
 	memset(url, 0, sizeof (struct yuarel));
 
-	/* relative URL, parse scheme and hostname */
+	/* Relative URL, parse scheme and hostname */
 	if (*u != '/') {
 		/* Scheme */
 		url->scheme = u;
@@ -75,6 +75,7 @@ yuarel_parse(struct yuarel *url, char *u)
 		/* Host */
 		if (*u == '\0')
 			return -1;
+
 		url->host = u;
 		start = u;
 	}
@@ -100,7 +101,7 @@ yuarel_parse(struct yuarel *url, char *u)
 		url->path = u + 1;
 	}
 
-	/* relative URI, parse port */
+	/* Relative URI, parse port */
 	if (url->scheme != NULL) {
 		/* (Port) */
 		u = strchr(start, ':');
@@ -114,9 +115,29 @@ yuarel_parse(struct yuarel *url, char *u)
 			else
 				url->port = atoi(u);
 		}
-		/* Missing hostname */
+
+		/* Missing hostname? */
 		if (*url->host == '\0')
 			return -1;
+
+		/* (Credentials) */
+		u = strchr(url->host, '@');
+		if (u != NULL) {
+			/* Missing credentials? */
+			if (u == url->host)
+				return -1;
+
+			url->username = url->host;
+			url->host = u + 1;
+			*u = '\0';
+
+			u = strchr(url->username, ':');
+			if (u == NULL) {
+				return -1;
+			}
+			url->password = u + 1;
+			*u = '\0';
+		}
 	}
 
 	return 0;

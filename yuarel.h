@@ -25,13 +25,15 @@
 /**
  * The struct where the parsed values will be stored:
  *
- * scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]
+ * scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]
  *
  * Note: to make sure that no strings are copied, the first slash "/" in the
  * path will be used to null terminate the hostname if no port is supplied.
  */
 struct yuarel {
 	char *scheme; /* scheme, without ":" and "//" */
+	char *username; /* username, default: NULL */
+	char *password; /* password, default: NULL */
 	char *host; /* hostname or IP address */
 	int port; /* port, default: 0 */
 	char *path; /* path, without leading "/", default: NULL */
@@ -51,7 +53,7 @@ struct yuarel_param {
  * The URL string should be in one of the following formats:
  *
  * Absolute URL:
- * scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
+ * scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
  *
  * Relative URL:
  * path [ "?" query ] [ "#" fragment ]
