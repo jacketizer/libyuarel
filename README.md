@@ -10,7 +10,7 @@ characters like `:` and `/`. For a URL should be able to be parsed by yuarel,
 it has to be constructed in one of the following formats:
 
 *Absolute URL:*
-scheme ":" [ "//" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
+scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
 
 *Relative URL:*
 path [ "?" query ] [ "#" fragment ]
@@ -50,6 +50,8 @@ The struct that holds the parsed URL looks like this:
 ```C
 struct yuarel {
 	char *scheme;	/* scheme, without ":" and "//" */
+	char *username;	/* username, default: NULL */
+	char *password;	/* password, default: NULL */
 	char *host;	/* hostname or IP address */
 	int port;	/* port, default: 0 */
 	char *path;	/* path, without leading "/", default: NULL */
