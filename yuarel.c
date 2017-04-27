@@ -103,8 +103,31 @@ yuarel_parse(struct yuarel *url, char *u)
 
 	/* Relative URI, parse port */
 	if (url->scheme != NULL) {
+		/* (Credentials) */
+		u = strchr(start, '@');
+		if (u != NULL) {
+			/* Missing credentials? */
+			if (u == url->host)
+				return -1;
+
+			url->username = start;
+			url->host = u + 1;
+			*u = '\0';
+
+			u = strchr(start, ':');
+			if (u == NULL) {
+				return -1;
+			}
+			url->password = u + 1;
+			*u = '\0';
+		}
+
+		/* Missing hostname? */
+		if (*url->host == '\0')
+			return -1;
+
 		/* (Port) */
-		u = strchr(start, ':');
+		u = strchr(url->host, ':');
 		if (u != NULL && (url->path == NULL || u < url->path)) {
 			*(u++) = '\0';
 			if (*u == '\0')
@@ -119,25 +142,6 @@ yuarel_parse(struct yuarel *url, char *u)
 		/* Missing hostname? */
 		if (*url->host == '\0')
 			return -1;
-
-		/* (Credentials) */
-		u = strchr(url->host, '@');
-		if (u != NULL) {
-			/* Missing credentials? */
-			if (u == url->host)
-				return -1;
-
-			url->username = url->host;
-			url->host = u + 1;
-			*u = '\0';
-
-			u = strchr(url->username, ':');
-			if (u == NULL) {
-				return -1;
-			}
-			url->password = u + 1;
-			*u = '\0';
-		}
 	}
 
 	return 0;
