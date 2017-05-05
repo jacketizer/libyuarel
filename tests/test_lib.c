@@ -109,6 +109,13 @@ test_parse_http_url_ok()
 	assert_struct(url, "http", NULL, NULL, "example.com", 8080, NULL, NULL, "f1");
 	free(url_string);
 
+	/* With port and credentials */
+	url_string = strdup("http://u:p@example.com:8080");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with port and credentials", -1 != rc);
+	assert_struct(url, "http", "u", "p", "example.com", 8080, NULL, NULL, NULL);
+	free(url_string);
+
 	/* With path and query */
 	url_string = strdup("http://example.com/path/and/query?q=yes");
 	rc = yuarel_parse(&url, url_string);
@@ -128,6 +135,27 @@ test_parse_http_url_ok()
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("with query and fragment", -1 != rc);
 	assert_struct(url, "http", NULL, NULL, "example.com", 0, NULL, "q=yes", "f1");
+	free(url_string);
+
+	/* With query and credentials */
+	url_string = strdup("http://u:p@example.com?q=yes");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with query and credentials", -1 != rc);
+	assert_struct(url, "http", "u", "p", "example.com", 0, NULL, "q=yes", NULL);
+	free(url_string);
+
+	/* With empty credentials */
+	url_string = strdup("http://:@example.com");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with empty credentials", -1 != rc);
+	assert_struct(url, "http", "", "", "example.com", 0, NULL, NULL, NULL);
+	free(url_string);
+
+	/* With empty credentials and port */
+	url_string = strdup("http://:@example.com:89");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with empty credentials and port", -1 != rc);
+	assert_struct(url, "http", "", "", "example.com", 89, NULL, NULL, NULL);
 	free(url_string);
 
 	/* Full URL */
@@ -226,6 +254,12 @@ test_parse_url_fail()
 	url_string = strdup("rtsp://:8910/path");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("missing hostname should return -1", -1 == rc);
+	free(url_string);
+
+	/* Missing credentials */
+	url_string = strdup("rtsp://@hostname:8910/path");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("missing credentials should return -1", -1 == rc);
 	free(url_string);
 
 	return 0;
