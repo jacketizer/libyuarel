@@ -236,6 +236,10 @@ yuarel_split_path(char *path, char **parts, int max_parts)
 {
 	int i = 0;
 
+	if (NULL == path || '\0' == *path) {
+		return -1;
+	}
+
 	do {
 		/* Forward to after slashes */
 		while (*path == '/') path++;
