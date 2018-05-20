@@ -204,7 +204,7 @@ yuarel_parse(struct yuarel *url, char *u)
 			if (NULL != u) {
 				url->host++;
 				char *temp = u;
-				u = strchr(u++, ':');
+			u = strchr(u++, ':');
 			       	*temp = '\0';
 			}
 			else {

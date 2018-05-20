@@ -46,11 +46,24 @@ test_parse_http_url_ok()
 	assert_struct(url, "http", NULL, NULL, "example.com", 0, NULL, NULL, NULL);
 	free(url_string);
 
+	/* Minimal URL with IPv6 hostname */
+	url_string = strdup("http://[3ffe:2a00:100:7031::1]");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("minimal http URL with IPv6 hostname", -1 != rc);
+	assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+
 	/* With path (/) */
 	url_string = strdup("http://example.com/");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("with path ('/')", -1 != rc);
 	assert_struct(url, "http", NULL, NULL, "example.com", 0, "", NULL, NULL);
+	free(url_string);
+
+	/* With IPv6 hostname and path (/) */
+	url_string = strdup("http://[3ffe:2a00:100:7031::1]/");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("With IPv6 hostname and path ('/')", -1 != rc);
+	assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, "", NULL, NULL);
 	free(url_string);
 
 	/* With path */
@@ -60,11 +73,25 @@ test_parse_http_url_ok()
 	assert_struct(url, "http", NULL, NULL, "example.com", 0, "path", NULL, NULL);
 	free(url_string);
 
+	/* With IPv6 hostname and path */
+	url_string = strdup("http://[3ffe:2a00:100:7031::1]/path");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with IPv6 hostname and path", -1 != rc);
+	assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, "path", NULL, NULL);
+	free(url_string);
+
 	/* With port */
 	url_string = strdup("http://example.com:80");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("with port only", -1 != rc);
 	assert_struct(url, "http", NULL, NULL, "example.com", 80, NULL, NULL, NULL);
+	free(url_string);
+
+	/* With IPv6 hostname and port */
+	url_string = strdup("http://[3ffe:2a00:100:7031::1]:80");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with IPv6 hostname and port", -1 != rc);
+	assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 80, NULL, NULL, NULL);
 	free(url_string);
 
 	/* With query */
@@ -88,11 +115,30 @@ test_parse_http_url_ok()
 	assert_struct(url, "http", "u", "p", "example.com", 0, NULL, NULL, NULL);
 	free(url_string);
 
+	/* With IPv6 hostname and credentials */
+	url_string = strdup("http://u:p@[3ffe:2a00:100:7031::1]");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with IPv6 hostname and credentials", -1 != rc);
+	assert_struct(url, "http", "u", "p", "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+
 	/* With port and path */
 	url_string = strdup("http://example.com:8080/port/and/path");
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("with port and path", -1 != rc);
 	assert_struct(url, "http", NULL, NULL, "example.com", 8080, "port/and/path", NULL, NULL);
+	free(url_string);
+
+	/* With IPv6 hostname, port and path */
+	url_string - strdup("http://[3ffe:2a00:100:7031::1]:8080/port/and/path");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with IPv6 hostname, port and path", -1 != rc);
+	printf("%s\n", url.scheme);
+	printf("%s\n", url.username);
+	printf("%s\n", url.password);
+	printf("%s\n", url.host);
+	printf("%s\n", url.port);
+	printf("%s\n", url.path);
+	assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 8080, "port/and/path", NULL, NULL);
 	free(url_string);
 
 	/* With port and query */
@@ -149,6 +195,13 @@ test_parse_http_url_ok()
 	rc = yuarel_parse(&url, url_string);
 	mu_assert("with empty credentials", -1 != rc);
 	assert_struct(url, "http", "", "", "example.com", 0, NULL, NULL, NULL);
+	free(url_string);
+
+	/* With IPv6 hostname and empty credentials */
+	url_string - strdup("http://:@[3ffe:2a00:100:7031::1]");
+	rc = yuarel_parse(&url, url_string);
+	mu_assert("with IPv6 hostname and empty credentials", -1 != rc);
+	assert_struct(url, "http", "", "", "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
 	free(url_string);
 
 	/* With empty credentials and port */
