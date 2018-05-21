@@ -194,7 +194,29 @@ yuarel_parse(struct yuarel *url, char *u)
 		}
 
 		/* (Port) */
-		u = strchr(url->host, ':');
+		// If hostname starts with square bracket, it is IPv6 literal
+		// example:
+      		// http://[1080:0:0:0:8:800:200C:417A]:80/index.html
+      		// http://[3ffe:2a00:100:7031::1]
+      		// http://[::192.9.5.5]/ipng
+		if ('[' == url->host[0]) {
+			u = strchr(url->host, ']');
+			if (NULL != u) {
+				url->host++;
+				*(u++) = '\0';
+				if ('\0' == *u) {
+					u = NULL;
+				}else
+				if (':' != *u) {
+					return -1;
+				}
+			}
+			else {
+				return -1;
+			}
+		}else{
+			u = strchr(url->host, ':');
+		}
 		if (NULL != u && (NULL == url->path || u < url->path)) {
 			*(u++) = '\0';
 			if ('\0' == *u) {
