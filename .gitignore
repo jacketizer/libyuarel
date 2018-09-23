@@ -30,3 +30,8 @@
 
 # Debug files
 *.dSYM/
+
+# Build and test
+build/
+test_lib
+simple
