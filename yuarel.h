@@ -65,7 +65,8 @@ struct yuarel_param {
  * The following parts will be parsed to the corresponding struct member.
  *
  * *url:     a pointer to the struct where to store the parsed values.
- * *url_str: a pointer to the url to be parsed (null terminated).
+ * *url_str: a pointer to the url to be parsed (null terminated). The string
+ *           will be modified.
  *
  * Returns 0 on success, otherwise -1.
  */
@@ -78,7 +79,7 @@ extern int yuarel_parse(struct yuarel *url, char *url_str);
  * pointers to each path part will be stored in **parts. Double slashes will be
  * treated as one.
  *
- * *path:     the path to split.
+ * *path:     the path to split. The string will be modified.
  * **parts:   a pointer to an array of (char *) where to store the result.
  * max_parts: max number of parts to parse.
  *
@@ -98,7 +99,7 @@ extern int yuarel_split_path(char *path, char **parts, int max_parts);
  * terminators and then pointers to each parameter key and value will be stored
  * in the yuarel_param struct.
  *
- * *query:     the query string to parse.
+ * *query:     the query string to parse. The string will be modified.
  * delimiter:  the character that separates the key/value pairs from eachother.
  * *params:    an array of (struct yuarel_param) where to store the result.
  * max_values: max number of parameters to parse.
