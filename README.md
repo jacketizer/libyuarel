@@ -80,6 +80,8 @@ int yuarel_parse(struct yuarel *url, char *url_str)
 `struct yuarel *url`: a pointer to the struct where to store the parsed values.
 `char *url_str`: a pointer to the url to be parsed (null terminated).
 
+**Note that the url string will be modified by the function.**
+
 Returns 0 on success, otherwise -1.
 
 ### Split a path into several strings
@@ -91,9 +93,11 @@ int yuarel_split_path(char *path, char **parts, int max_parts)
 No data is copied, the slashed are used as null terminators and then
 pointers to each path part will be stored in `parts`.
 
-`char *path`: the path to split.
+`char *path`: the path to split. The string will be modified.
 `char **parts`: a pointer to an array of `(char *)` where to store the result.
 `int max_parts`: max number of parts to parse.
+
+**Note that the path string will be modified by the function.**
 
 Returns the number of parsed items. -1 on error.
 
@@ -103,7 +107,7 @@ Returns the number of parsed items. -1 on error.
 int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
 ```
 
-`char *query`: the query string to parse.
+`char *query`: the query string to parse. The string will be modified.
 `char delimiter`: the character that separates the key/value pairs from eachother.
 `struct yuarel_param *params`: an array of `(struct yuarel_param)` where to store the result.
 `int max_values`: max number of parameters to parse.
@@ -116,6 +120,8 @@ that comes after it will be the value of the parameter.
 No data are copied, the equal sign and delimiters are used as null
 terminators and then pointers to each parameter key and value will be stored
 in the yuarel_param struct.
+
+**Note that the query string will be modified by the function.**
 
 Returns the number of parsed items. -1 on error.
 
