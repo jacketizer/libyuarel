@@ -1,17 +1,17 @@
-CUR_DIR = $(shell pwd)
-SRC_FILES = yuarel.c
-OBJ_FILES = $(patsubst %.c, %.o, $(SRC_FILES))
+CUR_DIR := $(shell pwd)
+SRC_FILES := yuarel.c
+OBJ_FILES := $(patsubst %.c, %.o, $(SRC_FILES))
 
-VERSION_MAJOR = 1
-VERSION_MINOR = 0
-VERSION = $(VERSION_MAJOR).$(VERSION_MINOR)
-LIBNAME = yuarel
-PKG_NAME = lib$(LIBNAME)-$(VERSION)
+VERSION_MAJOR := 1
+VERSION_MINOR := 0
+VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
+LIBNAME := yuarel
+PKG_NAME := lib$(LIBNAME)-$(VERSION)
 
-CC = gcc
-AR = ar
-CFLAGS = -c -fPIC -g -Wall
-LDFLAGS =-s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
+CC := gcc
+AR := ar
+CFLAGS := -c -fPIC -g -Wall
+LDFLAGS := -s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
 
 .PHONY: all
