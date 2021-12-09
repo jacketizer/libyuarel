@@ -108,7 +108,7 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
 ```
 
 `char *query`: the query string to parse. The string will be modified.
-`char delimiter`: the character that separates the key/value pairs from eachother.
+`char delimiter`: the character that separates the key/value pairs from each other.
 `struct yuarel_param *params`: an array of `(struct yuarel_param)` where to store the result.
 `int max_values`: max number of parameters to parse.
 
