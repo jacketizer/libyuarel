@@ -6,13 +6,12 @@ libyuarel
 [![C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![CI/CD Status Badge](https://github.com/mofosyne/libyuarel/actions/workflows/ci.yml/badge.svg)](https://github.com/mofosyne/libyuarel/actions)
 
-[![Build Status](https://travis-ci.org/jacketizer/libyuarel.svg?branch=master)](https://travis-ci.org/jacketizer/libyuarel)
-
-Very simple and well tested C library for parsing URLs with zero-copy and no
-mallocs. The library does not do any validation on the URL, neither before nor
-after it is parsed. The different parts are parsed by searching for special
-characters like `:` and `/`. For a URL should be able to be parsed by yuarel,
-it has to be constructed in one of the following formats:
+Very simple and well tested C library for parsing URLs and querystrings 
+with zero-copy and no mallocs. The library does not do any validation on
+the URL, neither before nor after it is parsed. The different parts are 
+parsed by searching for special characters like `:` and `/`. For a URL 
+should be able to be parsed by yuarel, it has to be constructed in one 
+of the following formats:
 
 *Absolute URL:*
 scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
@@ -86,7 +85,7 @@ Query string parameters:
 
 If you see this error
 
-```
+```bash
 $ make examples
 gcc examples/simple.c -lyuarel -o simple
 examples/simple.c:3:10: fatal error: yuarel.h: No such file or directory
