@@ -21,6 +21,8 @@ jobs:
 #      run: ./configure
     - name: make
       run: make
+    - name: make install
+      run: make install
     - name: make check
       run: make check
     - name: make examples
