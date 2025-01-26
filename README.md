@@ -4,7 +4,7 @@ libyuarel
 <versionBadge>![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue.svg)</versionBadge>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
-[![CI/CD Status Badge](https://github.com/mofosyne/libyuarel/actions/workflows/ci.yml/badge.svg)](https://github.com/mofosyne/libyuarel/actions)
+[![CI/CD Status Badge](https://github.com/mofosyne/libyuarel/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/mofosyne/libyuarel/actions)
 
 Very simple and well tested C library for parsing URLs and querystrings 
 with zero-copy and no mallocs. The library does not do any validation on

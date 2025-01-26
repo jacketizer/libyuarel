@@ -46,6 +46,7 @@ install: all
 .PHONY: examples
 examples: examples/simple.c
 	$(CC) examples/simple.c -l$(LIBNAME) -o simple
+	./simple
 
 .PHONY: check
 check:
