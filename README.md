@@ -229,3 +229,5 @@ int main(void)
 
 * 2016-04-01 : Originally Created By [jacketizer](https://github.com/jacketizer) under [jacketizer/libyuarel](https://github.com/jacketizer/libyuarel)
 * 2025-01-27 : Forked by Mofosyne to make it avaliable under clib for better discoverbility by other C programmers
+	- Did some investigation and found [user without password does not parse #13](https://github.com/jacketizer/libyuarel/issues/13#issue-502758138)
+		- There was an out of repo patch for it's usage in a seperate software named [flux-core](https://github.com/garlick/flux-core/commit/9f9c59b0b584df21061ade70ed4cdc49ce707ebd). Looks important enough to include compaired to other changes shown in the original [jaketizer/libyuarel github network graph](https://github.com/jacketizer/libyuarel/network).
