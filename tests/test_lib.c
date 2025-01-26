@@ -434,6 +434,43 @@ static unsigned char *test_parse_query_ok()
     return 0;
 }
 
+static unsigned char *test_parse_file_url_ok()
+{
+    int rc;
+    struct yuarel url;
+    char *url_string;
+
+    /* Minimal file URL */
+    url_string = strdup("file:///home/john/file.txt");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("minimal file URL", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/file.txt", NULL, NULL);
+    free(url_string);
+
+    /* File URL with directory */
+    url_string = strdup("file:///home/john/");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("file URL with directory", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/", NULL, NULL);
+    free(url_string);
+
+    /* File URL with path */
+    url_string = strdup("file:///home/john/file.txt");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("file URL with path", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/file.txt", NULL, NULL);
+    free(url_string);
+
+    /* File URL with absolute path */
+    url_string = strdup("file:///absolute/path/to/file.txt");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("file URL with absolute path", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/absolute/path/to/file.txt", NULL, NULL);
+    free(url_string);
+
+    return 0;
+}
+
 static unsigned char *all_tests()
 {
     mu_group("yuarel_parse() with an HTTP URL");
@@ -450,6 +487,9 @@ static unsigned char *all_tests()
 
     mu_group("yuarel_parse_query()");
     mu_run_test(test_parse_query_ok);
+
+    mu_group("test_parse_file_url_ok()");
+    mu_run_test(test_parse_file_url_ok);
 
     return 0;
 }
