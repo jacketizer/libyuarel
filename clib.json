@@ -1,0 +1,19 @@
+{
+  "name": "libyuarel",
+  "version": "1.0.0",
+  "repo": "mofosyne/libyuarel",
+  "description": "Very simple and well tested C library for parsing URLs with zero-copy and no mallocs.",
+  "keywords": [
+    "http",
+    "url",
+    "querystring",
+    "no malloc",
+    "malloc free",
+    "no dependencies"
+  ],
+  "license": "MIT",
+  "src": [
+    "yuarel.c",
+    "yuarel.h"
+  ]
+}

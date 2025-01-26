@@ -1,6 +1,11 @@
 libyuarel
 =========
 
+<versionBadge>![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue.svg)</versionBadge>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![CI/CD Status Badge](https://github.com/mofosyne/libyuarel/actions/workflows/ci.yml/badge.svg)](https://github.com/mofosyne/libyuarel/actions)
+
 [![Build Status](https://travis-ci.org/jacketizer/libyuarel.svg?branch=master)](https://travis-ci.org/jacketizer/libyuarel)
 
 Very simple and well tested C library for parsing URLs with zero-copy and no
@@ -23,11 +28,29 @@ Due to the fact that the library isn't copying any strings and instead points
 to the parts in the URL string, the first `/` in the path will be replaced with
 a null terminator. Therefore, the first slash will be missing in the path.
 
-## To build
+## To install directly in your C project via clib
+
+The library consists of two files, easily integrated into your project manually or via [clib](https://github.com/clibs/clib)
+
+```bash
+clib install mofosyne/libyuarel
+```
+
+or copy these files manually to your source folder:
+
+```bash
+yuarel.c
+yuarel.h
+```
+## To build and install libyuarel library
 
 ```sh
 $ make && make check && sudo make install
 ```
+
+Which by default will install both the dynamic library `libyuarel.so.1`
+as well as the static library `libyuarel.a` to `/usr/lib` with `yuarel.h`
+copied to `/usr/include`.
 
 ## Try it
 
@@ -42,6 +65,39 @@ Run the example program:
 ```sh
 $ ./simple
 ```
+
+You should expect to see an output like so:
+
+```
+Struct values:
+        scheme:         http
+        host:           localhost
+        port:           8989
+        path:           path/to/test
+        query:          query=yes&param1=no
+        fragment:       frag=1
+
+Path parts: 'path', 'to', 'test'
+
+Query string parameters:
+        param1: no
+        query: yes
+```
+
+If you see this error
+
+```
+$ make examples
+gcc examples/simple.c -lyuarel -o simple
+examples/simple.c:3:10: fatal error: yuarel.h: No such file or directory
+    3 | #include <yuarel.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+make: *** [Makefile:48: examples] Error 1
+```
+
+Then you have likely not successfully installed libyuarel library
+as explained in previous section.
 
 ## The structs
 
@@ -167,5 +223,9 @@ int main(void)
 		printf("\t%s: %s\n", params[p].key, params[p].val);
 	}
 }
-
 ```
+
+## Maintainer History
+
+* 2016-04-01 : Originally Created By [jacketizer](https://github.com/jacketizer) under [jacketizer/libyuarel](https://github.com/jacketizer/libyuarel)
+* 2025-01-27 : Forked by Mofosyne to make it avaliable under clib for better discoverbility by other C programmers

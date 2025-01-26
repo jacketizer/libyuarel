@@ -4,7 +4,8 @@ OBJ_FILES := $(patsubst %.c, %.o, $(SRC_FILES))
 
 VERSION_MAJOR := 1
 VERSION_MINOR := 0
-VERSION := $(VERSION_MAJOR).$(VERSION_MINOR)
+VERSION_PATCH := 0
+VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 LIBNAME := yuarel
 PKG_NAME := lib$(LIBNAME)-$(VERSION)
 
@@ -16,6 +17,14 @@ PREFIX ?= /usr
 
 .PHONY: all
 all: yuarel
+
+# Dev Note: $ is used by both make and AWK. Must escape $ for use in AWK within makefile.
+.PHONY: readme_update
+readme_update:
+	# Library Version (From clib package metadata)
+	echo "${VERSION}" | xargs -I{} sed -i 's|<version>.*</version>|<version>{}</version>|' README.md
+	echo "${VERSION}" | xargs -I{} sed -i 's|<versionBadge>.*</versionBadge>|<versionBadge>![Version {}](https://img.shields.io/badge/version-{}-blue.svg)</versionBadge>|' README.md
+	jq --arg version "${VERSION}" '.version = $$version' clib.json > clib.json.tmp && mv clib.json.tmp clib.json
 
 .PHONY: yuarel
 yuarel: $(SRC_FILES) $(OBJ_FILES)
