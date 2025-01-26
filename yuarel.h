@@ -23,7 +23,8 @@
 #define INC_YUAREL_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -34,21 +35,23 @@ extern "C" {
  * Note: to make sure that no strings are copied, the first slash "/" in the
  * path will be used to null terminate the hostname if no port is supplied.
  */
-struct yuarel {
-	char *scheme; /* scheme, without ":" and "//" */
-	char *username; /* username, default: NULL */
-	char *password; /* password, default: NULL */
-	char *host; /* hostname or IP address */
-	int port; /* port, default: 0 */
-	char *path; /* path, without leading "/", default: NULL */
-	char *query; /* query, default: NULL */
-	char *fragment; /* fragment, default: NULL */
+struct yuarel
+{
+    char *scheme;   /* scheme, without ":" and "//" */
+    char *username; /* username, default: NULL */
+    char *password; /* password, default: NULL */
+    char *host;     /* hostname or IP address */
+    int port;       /* port, default: 0 */
+    char *path;     /* path, without leading "/", default: NULL */
+    char *query;    /* query, default: NULL */
+    char *fragment; /* fragment, default: NULL */
 };
 
 /* A struct to hold the query string parameter values. */
-struct yuarel_param {
-	char *key;
-	char *val;
+struct yuarel_param
+{
+    char *key;
+    char *val;
 };
 
 /**

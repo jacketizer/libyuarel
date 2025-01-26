@@ -1,0 +1,16 @@
+TabWidth: 4
+IndentWidth: 4
+
+Language: Cpp
+
+BreakBeforeBraces: Allman
+InsertNewlineAtEOF: True
+InsertBraces: True
+IndentCaseLabels: True
+
+# https://stackoverflow.com/questions/47683910/can-you-set-clang-formats-line-length
+ColumnLimit: 200
+
+IndentExternBlock: NoIndent
+
+BinPackArguments: false

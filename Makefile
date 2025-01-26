@@ -65,6 +65,15 @@ dist:
 	cp -r examples $(PKG_NAME)/
 	tar -pczf $(PKG_NAME).tar.gz $(PKG_NAME)
 
+.PHONY: format
+format:
+	# pip install clang-format
+	clang-format -i *.c
+	clang-format -i *.h
+	clang-format -i tests/*.c
+	clang-format -i tests/*.h
+	clang-format -i examples/*.c
+
 .PHONY: clean
 clean:
 	rm -f *.o
