@@ -77,6 +77,8 @@ format:
 .PHONY: clean
 clean:
 	rm -f *.o
+	rm -f *.a
+	rm -f *.so.*
 	rm -fr build
 	rm -f simple test_lib
 

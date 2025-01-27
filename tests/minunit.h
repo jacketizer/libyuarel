@@ -33,7 +33,7 @@
 #define mu_run_test(test)                                                                                                                                                                              \
     do                                                                                                                                                                                                 \
     {                                                                                                                                                                                                  \
-        const char *message = test();                                                                                                                                                                        \
+        const char *message = test();                                                                                                                                                                  \
         tests_run++;                                                                                                                                                                                   \
         if (message)                                                                                                                                                                                   \
         {                                                                                                                                                                                              \
