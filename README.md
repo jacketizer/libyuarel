@@ -13,11 +13,8 @@ parsed by searching for special characters like `:` and `/`. For a URL
 should be able to be parsed by yuarel, it has to be constructed in one 
 of the following formats:
 
-*Absolute URL:*
-scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
-
-*Relative URL:*
-path [ "?" query ] [ "#" fragment ]
+ - *Absolute URL:* `scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]`
+ - *Relative URL:* `path [ "?" query ] [ "#" fragment ]`
 
 Parts within `[` and `]` are optional. A minimal URL could look like this:
 
@@ -132,8 +129,8 @@ struct yuarel_param {
 int yuarel_parse(struct yuarel *url, char *url_str)
 ```
 
-`struct yuarel *url`: a pointer to the struct where to store the parsed values.
-`char *url_str`: a pointer to the url to be parsed (null terminated).
+ - `struct yuarel *url`: a pointer to the struct where to store the parsed values.
+ - `char *url_str`: a pointer to the url to be parsed (null terminated).
 
 **Note that the url string will be modified by the function.**
 
@@ -148,9 +145,9 @@ int yuarel_split_path(char *path, char **parts, int max_parts)
 No data is copied, the slashed are used as null terminators and then
 pointers to each path part will be stored in `parts`.
 
-`char *path`: the path to split. The string will be modified.
-`char **parts`: a pointer to an array of `(char *)` where to store the result.
-`int max_parts`: max number of parts to parse.
+ - `char *path`: the path to split. The string will be modified.
+ - `char **parts`: a pointer to an array of `(char *)` where to store the result.
+ - `int max_parts`: max number of parts to parse.
 
 **Note that the path string will be modified by the function.**
 
@@ -162,10 +159,10 @@ Returns the number of parsed items. -1 on error.
 int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
 ```
 
-`char *query`: the query string to parse. The string will be modified.
-`char delimiter`: the character that separates the key/value pairs from each other.
-`struct yuarel_param *params`: an array of `(struct yuarel_param)` where to store the result.
-`int max_values`: max number of parameters to parse.
+ - `char *query`: the query string to parse. The string will be modified.
+ - `char delimiter`: the character that separates the key/value pairs from each other.
+ - `struct yuarel_param *params`: an array of `(struct yuarel_param)` where to store the result.
+ - `int max_values`: max number of parameters to parse.
 
 The query string should be a null terminated string of parameters separated by
 a delimiter. Each parameter are checked for the equal sign character. If it
@@ -179,6 +176,22 @@ in the yuarel_param struct.
 **Note that the query string will be modified by the function.**
 
 Returns the number of parsed items. -1 on error.
+
+### Parse a url encoded string
+
+```c
+char *yuarel_url_decode(char *str);
+```
+
+ - `char *str`: The input string to decode. This string must be null-terminated. Note that the function modifies this string during decoding.
+
+This function decodes a percent-encoded URL string in place. Percent-encoded characters (e.g., `%20`) are replaced with their corresponding ASCII characters, and any `+` characters are converted to spaces.
+
+The decoding modifies the input string directly. No additional memory is allocated during the operation, making it efficient for in-place URL decoding.
+
+**Note that the path string will be modified by the function.**
+
+Returns a pointer to the same address as the input string but decoded.
 
 ## How to use it:
 
