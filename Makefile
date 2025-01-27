@@ -11,14 +11,13 @@ PKG_NAME := lib$(LIBNAME)-$(VERSION)
 
 CC := gcc
 AR := ar
-CFLAGS := -c -fPIC -g -Wall
+CFLAGS := -c -fPIC -g -Wall -Werror
 LDFLAGS := -s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
 
 .PHONY: all
 all: yuarel
 
-# Dev Note: $ is used by both make and AWK. Must escape $ for use in AWK within makefile.
 .PHONY: readme_update
 readme_update:
 	# Library Version (From clib package metadata)

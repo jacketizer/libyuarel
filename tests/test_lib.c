@@ -34,7 +34,7 @@ static int strcmp_wrap(const char *str, const char *str2)
     mu_silent_assert("should set the query attribute correctly", 0 == strcmp_wrap(as_url.query, as_query));                                                                                            \
     mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp_wrap(as_url.fragment, as_fragment));
 
-static unsigned char *test_parse_http_url_ok()
+static const char *test_parse_http_url_ok()
 {
     int rc;
     struct yuarel url;
@@ -190,7 +190,7 @@ static unsigned char *test_parse_http_url_ok()
     return 0;
 }
 
-static unsigned char *test_parse_http_rel_url_ok()
+static const char *test_parse_http_rel_url_ok()
 {
     int rc;
     struct yuarel url;
@@ -234,7 +234,7 @@ static unsigned char *test_parse_http_rel_url_ok()
     return 0;
 }
 
-static unsigned char *test_parse_url_fail()
+static const char *test_parse_url_fail()
 {
     int rc;
     struct yuarel url;
@@ -285,7 +285,7 @@ static unsigned char *test_parse_url_fail()
     return 0;
 }
 
-static unsigned char *test_split_path_ok()
+static const char *test_split_path_ok()
 {
     int rc;
     char *path;
@@ -331,7 +331,7 @@ static unsigned char *test_split_path_ok()
     return 0;
 }
 
-static unsigned char *test_parse_query_ok()
+static const char *test_parse_query_ok()
 {
     int rc;
     char *q;
@@ -434,7 +434,7 @@ static unsigned char *test_parse_query_ok()
     return 0;
 }
 
-static unsigned char *all_tests()
+static const char *all_tests()
 {
     mu_group("yuarel_parse() with an HTTP URL");
     mu_run_test(test_parse_http_url_ok);
@@ -456,9 +456,8 @@ static unsigned char *all_tests()
 
 int main(void)
 {
-    unsigned char *result;
+    const char *result = all_tests();
 
-    result = all_tests();
     if (result != 0)
     {
         exit(EXIT_FAILURE);
