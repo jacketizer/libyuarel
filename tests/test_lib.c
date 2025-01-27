@@ -4,6 +4,25 @@
 #include <string.h>
 #include <yuarel.h>
 
+#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200809L
+// https://stackoverflow.com/questions/26284110/strdup-confused-about-warnings-implicit-declaration-makes-pointer-with
+// https://stackoverflow.com/questions/12575267/which-macro-is-being-used-with-strdup-on-linux
+char *strdup(const char *src)
+{
+    // Space for length plus nul
+    char *dst = malloc(strlen(src) + 1);
+    if (dst == NULL)
+    {
+        // No memory
+        return NULL;
+    }
+    // Copy the characters
+    strcpy(dst, src);
+    // Return the new string
+    return dst;
+}
+#endif
+
 int tests_run;
 
 static int strcmp_wrap(const char *str, const char *str2)
@@ -434,7 +453,8 @@ static const char *test_parse_query_ok()
     return 0;
 }
 
-static const char *yuarel_url_decode_ok() {
+static const char *yuarel_url_decode_ok()
+{
     char *q;
 
     // Empty String

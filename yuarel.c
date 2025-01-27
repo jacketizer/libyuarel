@@ -51,7 +51,7 @@ static inline int natoi(const char *str, size_t len)
 /**
  * Check if a URL is relative (no scheme and hostname).
  *
- * A relative URL starts with a "/" but does not include a scheme (e.g., "http://") 
+ * A relative URL starts with a "/" but does not include a scheme (e.g., "http://")
  * or a hostname. This function determines whether the given URL is relative based
  * on this criteria.
  *
@@ -127,11 +127,11 @@ static inline char *find_and_terminate(char *str, char find)
     return str + 1;
 }
 
-/* 
+/*
     Dev Note: Regarding find_fragment(), find_query() and find_path()
                 Yes, the following functions could be implemented as preprocessor macros
                 instead of inline functions, but I think that this approach will be more
-                clean in this case. 
+                clean in this case.
 */
 
 /**
@@ -151,7 +151,7 @@ static inline char *find_fragment(char *str) { return find_and_terminate(str, '#
 /**
  * Find the query part of a URL (everything after the '?' character).
  *
- * This function searches for the query delimiter ('?') in the URL and, 
+ * This function searches for the query delimiter ('?') in the URL and,
  * if found, replaces it with a null terminator ('\0'). It returns a pointer
  * to the part of the string after the query delimiter.
  *
@@ -179,8 +179,8 @@ static inline char *find_path(char *str) { return find_and_terminate(str, '/'); 
 /**
  * @brief Parse a URL into its components.
  *
- * This function parses a URL into its components: 
- *     scheme, host, port, path, query, and fragment. 
+ * This function parses a URL into its components:
+ *     scheme, host, port, path, query, and fragment.
  * The URL string should be in one of the following formats:
  *
  * Absolute URL:
@@ -373,11 +373,6 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
 {
     int i = 0;
 
-    if (NULL == query || '\0' == *query)
-    {
-        return -1;
-    }
-
     params[i++].key = query;
     while (i < max_params && NULL != (query = strchr(query, delimiter)))
     {
@@ -407,9 +402,9 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
 
 /**
  * @brief Decode a percent-encoded URL string in place.
- * 
+ *
  * This function decodes percent-encoded characters (`%XX`) in the input URL
- * string and replaces `+` with spaces. The string is modified directly, and 
+ * string and replaces `+` with spaces. The string is modified directly, and
  * no additional memory is allocated.
  *
  * @warning: Modifies the input string as part of the parsing process.
@@ -423,6 +418,11 @@ char *yuarel_url_decode(char *str)
     // Hex decoding utilities
 #define YUAREL_URL_DECODE_IS_HEX(ch) (('0' <= (ch) && (ch) <= '9') || ('a' <= (ch) && (ch) <= 'f') || ('A' <= (ch) && (ch) <= 'F'))
 #define YUAREL_URL_DECODE_PARSE_HEX(ch) (('0' <= (ch) && (ch) <= '9') ? (ch) - '0' : ('a' <= (ch) && (ch) <= 'f') ? 10 + (ch) - 'a' : ('A' <= (ch) && (ch) <= 'F') ? 10 + (ch) - 'A' : 0)
+
+    if (NULL == str || '\0' == *str)
+    {
+        return str;
+    }
 
     const char *read_ptr = str;
     char *write_ptr = str;

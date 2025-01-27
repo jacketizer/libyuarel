@@ -5,11 +5,15 @@ default:
 install:
     sudo make install
 
+# Uninstall Static and Dynamic Library from /usr
+uninstall:
+    sudo make uninstall
+
 # Run Tests check
 check:
     make check
 
-# Run Examples check
+# Run Examples Program (Requires yuarel.h to be installed into system)
 examples:
     make examples
 
@@ -20,3 +24,7 @@ update_readme:
 # Generate Documentation
 doxygen:
     make doxygen
+
+# Format Code To Repo Standard
+format:
+    make format

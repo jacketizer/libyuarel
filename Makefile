@@ -4,7 +4,7 @@ OBJ_FILES := $(patsubst %.c, %.o, $(SRC_FILES))
 
 VERSION_MAJOR := 1
 VERSION_MINOR := 1
-VERSION_PATCH := 0
+VERSION_PATCH := 1
 VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 LIBNAME := yuarel
 PKG_NAME := lib$(LIBNAME)-$(VERSION)
@@ -14,6 +14,9 @@ AR := ar
 CFLAGS := -c -fPIC -g -Wall -Werror -std=c99 -pedantic
 LDFLAGS := -s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
+
+CHECK_CFLAGS := -Wall -Werror -std=c99 -pedantic
+EXAMPLES_CFLAGS := -Wall -Werror -std=c99 -pedantic
 
 DOXYFILE ?= Doxyfile
 DOXYGEN_OUTPUT_DIR ?= doc
@@ -45,18 +48,36 @@ install: all
 	install yuarel.h $(PREFIX)/include/
 	ldconfig -n $(PREFIX)/lib
 
+.PHONY: uninstall
+uninstall:
+	# Remove libraries
+	rm -f $(PREFIX)/lib/lib$(LIBNAME).so.$(VERSION_MAJOR) $(PREFIX)/lib/lib$(LIBNAME).a
+	# Remove the symbolic link
+	rm -f $(PREFIX)/lib/lib$(LIBNAME).so
+	# Remove the header file
+	rm -f $(PREFIX)/include/yuarel.h
+	# Re-run ldconfig to clear the cache
+	ldconfig
+
 .PHONY: examples
 examples: examples/simple.c
-	$(CC) examples/simple.c -l$(LIBNAME) -o simple
+	$(CC) $(EXAMPLES_CFLAGS) examples/simple.c -l$(LIBNAME) -o simple
 	./simple
 
 .PHONY: check
 check:
 	@mkdir -p build
 	PREFIX=$(CUR_DIR)/build make install
-	$(CC) tests/test_lib.c -Ibuild/include -Lbuild/lib -l$(LIBNAME) -o test_lib
+	$(CC) $(CHECK_CFLAGS) tests/test_lib.c -Ibuild/include -Lbuild/lib -l$(LIBNAME) -o test_lib
+	$(CC) $(EXAMPLES_CFLAGS) examples/simple.c -Ibuild/include -Lbuild/lib -l$(LIBNAME) -o simple
+
+	# Run Main Tests
 	LD_LIBRARY_PATH="build/lib" \
 	./test_lib
+
+	# Run Examples
+	LD_LIBRARY_PATH="build/lib" \
+	./simple
 
 .PHONY: dist
 dist:

@@ -60,7 +60,7 @@ struct yuarel
  * @struct yuarel_param
  * @brief Structure for holding query string parameters.
  *
- * This structure is used to store key-value pairs representing query 
+ * This structure is used to store key-value pairs representing query
  * parameters in the URL's query string.
  */
 struct yuarel_param
@@ -72,8 +72,8 @@ struct yuarel_param
 /**
  * @brief Parse a URL into its components.
  *
- * This function parses a URL into its components: 
- *     scheme, host, port, path, query, and fragment. 
+ * This function parses a URL into its components:
+ *     scheme, host, port, path, query, and fragment.
  * The URL string should be in one of the following formats:
  *
  * Absolute URL:
@@ -135,9 +135,9 @@ extern int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *
 
 /**
  * @brief Decode a percent-encoded URL string in place.
- * 
+ *
  * This function decodes percent-encoded characters (`%XX`) in the input URL
- * string and replaces `+` with spaces. The string is modified directly, and 
+ * string and replaces `+` with spaces. The string is modified directly, and
  * no additional memory is allocated.
  *
  * @warning: Modifies the input string as part of the parsing process.

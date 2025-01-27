@@ -1,7 +1,7 @@
 libyuarel
 =========
 
-<versionBadge>![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-blue.svg)</versionBadge>
+<versionBadge>![Version 1.1.1](https://img.shields.io/badge/version-1.1.1-blue.svg)</versionBadge>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![CI/CD Status Badge](https://github.com/mofosyne/libyuarel/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/mofosyne/libyuarel/actions)
@@ -198,43 +198,73 @@ Returns a pointer to the same address as the input string but decoded.
 Compile with `-lyuarel`.
 
 ```C
-#include <stdlib.h>
 #include <stdio.h>
 #include <yuarel.h>
 
+#define MAX_PART_COUNT 3
+#define MAX_PARAM_COUNT 6
+
 int main(void)
 {
-	int p;
-	struct yuarel url;
-	char *parts[3];
-	char url_string[] = "http://localhost:8989/path/to/test?query=yes#frag=1";
+    int p = 0;
+    struct yuarel url = {0};
+    char *parts[MAX_PART_COUNT] = {NULL};
+    struct yuarel_param params[MAX_PARAM_COUNT];
+    char url_string[] = "http://localhost:8989/path/to/test?flag1&query=yes&flag2&param1=no&flag3&greet=hello%20world#frag=1";
 
-	if (-1 == yuarel_parse(&url, url_string)) {
-		fprintf(stderr, "Could not parse url!\n");
-		return 1;
-	}
+    if (-1 == yuarel_parse(&url, url_string))
+    {
+        fprintf(stderr, "Could not parse url!\n");
+        return 1;
+    }
 
-	printf("scheme:\t%s\n", url.scheme);
-	printf("host:\t%s\n", url.host);
-	printf("port:\t%d\n", url.port);
-	printf("path:\t%s\n", url.path);
-	printf("query:\t%s\n", url.query);
-	printf("fragment:\t%s\n", url.fragment);
+    printf("Struct values:\n");
+    printf("\tscheme:\t\t%s\n", url.scheme);
+    printf("\thost:\t\t%s\n", url.host);
+    printf("\tport:\t\t%d\n", url.port);
+    printf("\tpath:\t\t%s\n", url.path);
+    printf("\tquery:\t\t%s\n", url.query);
+    printf("\tfragment:\t%s\n", url.fragment);
 
-	if (3 != yuarel_split_path(url.path, parts, 3)) {
-		fprintf(stderr, "Could not split path!\n");
-		return 1;
-	}
+    if (3 != yuarel_split_path(url.path, parts, MAX_PART_COUNT))
+    {
+        fprintf(stderr, "Could not split path!\n");
+        return 1;
+    }
 
-	printf("path parts: %s, %s, %s\n", parts[0], parts[1], parts[2]);
+    printf("\nPath parts: '%s', '%s', '%s'\n\n", parts[0], parts[1], parts[2]);
 
-	printf("Query string parameters:\n");
+    printf("Query string parameters:\n");
 
-	p = yuarel_parse_query(url.query, '&', params, 3);
-	while (p-- > 0) {
-		printf("\t%s: %s\n", params[p].key, params[p].val);
-	}
+    p = yuarel_parse_query(url.query, '&', params, MAX_PARAM_COUNT);
+    while (p-- > 0)
+    {
+        yuarel_url_decode(params[p].val);
+        printf("\t%s: %s\n", params[p].key, params[p].val);
+    }
 }
+```
+
+Which you would expect this output
+
+```
+Struct values:
+        scheme:         http
+        host:           localhost
+        port:           8989
+        path:           path/to/test
+        query:          flag1&query=yes&flag2&param1=no&flag3&greet=hello%20world
+        fragment:       frag=1
+
+Path parts: 'path', 'to', 'test'
+
+Query string parameters:
+        greet: hello world
+        flag3: (null)
+        param1: no
+        flag2: (null)
+        query: yes
+        flag1: (null)
 ```
 
 ## Maintainer History
