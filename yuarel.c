@@ -373,6 +373,11 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
 {
     int i = 0;
 
+    if (NULL == query || '\0' == *query)
+    {
+        return -1;
+    }
+
     params[i++].key = query;
     while (i < max_params && NULL != (query = strchr(query, delimiter)))
     {
