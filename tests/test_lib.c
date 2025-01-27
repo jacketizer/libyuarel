@@ -434,6 +434,84 @@ static const char *test_parse_query_ok()
     return 0;
 }
 
+static const char *yuarel_url_decode_ok() {
+    char *q;
+
+    // Empty String
+    q = strdup("");
+    q = yuarel_url_decode(q);
+    mu_assert("empty string do nothing", 0 == strcmp("", q));
+    free(q);
+
+    // Simple percent encoding
+    q = strdup("Hello%20World");
+    q = yuarel_url_decode(q);
+    mu_assert("percent encoding %20 as space", 0 == strcmp("Hello World", q));
+    free(q);
+
+    // Multiple percent-encoded characters
+    q = strdup("Hello%20World%21");
+    q = yuarel_url_decode(q);
+    mu_assert("multiple percent encoding", 0 == strcmp("Hello World!", q));
+    free(q);
+
+    // Plus as space (x-www-form-urlencoded)
+    q = strdup("Hello+World");
+    q = yuarel_url_decode(q);
+    mu_assert("plus as space", 0 == strcmp("Hello World", q));
+    free(q);
+
+    // Malformed percent encoding (invalid hex)
+    q = strdup("abc%xy");
+    q = yuarel_url_decode(q);
+    mu_assert("invalid percent encoding", 0 == strcmp("abc%xy", q));
+    free(q);
+
+    // Decoding multiple valid percent-encoded characters
+    q = strdup("abc%20def%3A%2Fgh");
+    q = yuarel_url_decode(q);
+    mu_assert("decode multiple percent encodings", 0 == strcmp("abc def:/gh", q));
+    free(q);
+
+    // Percent encoding with uppercase hex
+    q = strdup("Hex%2DTest");
+    q = yuarel_url_decode(q);
+    mu_assert("percent encoding with uppercase hex", 0 == strcmp("Hex-Test", q));
+    free(q);
+
+    // Percent encoding with lowercase hex
+    q = strdup("Hello%3Aworld");
+    q = yuarel_url_decode(q);
+    mu_assert("percent encoding with lowercase hex", 0 == strcmp("Hello:world", q));
+    free(q);
+
+    // String with special characters
+    q = strdup("Hello%2C%20how%20are%20you%3F");
+    q = yuarel_url_decode(q);
+    mu_assert("string with special characters", 0 == strcmp("Hello, how are you?", q));
+    free(q);
+
+    // URL-encoded key-value pair
+    q = strdup("key%3Dvalue");
+    q = yuarel_url_decode(q);
+    mu_assert("decode key-value pair", 0 == strcmp("key=value", q));
+    free(q);
+
+    // Long input string with mixed encodings
+    q = strdup("long%20test%20with%20multiple%20encodings%20%3D%20and%20spaces");
+    q = yuarel_url_decode(q);
+    mu_assert("long input with mixed encodings", 0 == strcmp("long test with multiple encodings = and spaces", q));
+    free(q);
+
+    // Percent encoding with multiple consecutive encodings
+    q = strdup("Hello%%20World");
+    q = yuarel_url_decode(q);
+    mu_assert("multiple consecutive percent encodings", 0 == strcmp("Hello% World", q));
+    free(q);
+
+    return 0;
+}
+
 static const char *all_tests()
 {
     mu_group("yuarel_parse() with an HTTP URL");
@@ -450,6 +528,9 @@ static const char *all_tests()
 
     mu_group("yuarel_parse_query()");
     mu_run_test(test_parse_query_ok);
+
+    mu_group("yuarel_url_decode()");
+    mu_run_test(yuarel_url_decode_ok);
 
     return 0;
 }

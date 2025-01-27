@@ -3,7 +3,7 @@ SRC_FILES := yuarel.c
 OBJ_FILES := $(patsubst %.c, %.o, $(SRC_FILES))
 
 VERSION_MAJOR := 1
-VERSION_MINOR := 0
+VERSION_MINOR := 1
 VERSION_PATCH := 0
 VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 LIBNAME := yuarel
@@ -11,15 +11,18 @@ PKG_NAME := lib$(LIBNAME)-$(VERSION)
 
 CC := gcc
 AR := ar
-CFLAGS := -c -fPIC -g -Wall -Werror
+CFLAGS := -c -fPIC -g -Wall -Werror -std=c99 -pedantic
 LDFLAGS := -s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
+
+DOXYFILE ?= Doxyfile
+DOXYGEN_OUTPUT_DIR ?= doc
 
 .PHONY: all
 all: yuarel
 
-.PHONY: readme_update
-readme_update:
+.PHONY: update_readme
+update_readme:
 	# Library Version (From clib package metadata)
 	echo "${VERSION}" | xargs -I{} sed -i 's|<version>.*</version>|<version>{}</version>|' README.md
 	echo "${VERSION}" | xargs -I{} sed -i 's|<versionBadge>.*</versionBadge>|<versionBadge>![Version {}](https://img.shields.io/badge/version-{}-blue.svg)</versionBadge>|' README.md
@@ -76,14 +79,22 @@ format:
 
 .PHONY: clean
 clean:
+	@echo "Cleaning up generated documentation..."
 	rm -f *.o
 	rm -f *.a
 	rm -f *.so.*
 	rm -fr build
 	rm -f simple test_lib
+	rm -rf $(DOXYGEN_OUTPUT_DIR)
 
 .PHONY: dist-clean
 dist-clean: clean
 	rm -f libyuarel.so.*
 	rm -rf $(PKG_NAME)
 	rm -f $(PKG_NAME).tar.gz
+
+# Run doxygen to generate documentation
+.PHONY: doxygen
+doxygen:
+	@echo "Generating Doxygen documentation..."
+	doxygen $(DOXYFILE)

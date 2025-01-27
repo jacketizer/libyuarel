@@ -25,10 +25,16 @@
 #include <string.h>
 
 /**
- * Parse a non null terminated string into an integer.
+ * Parse a non-null terminated string into an integer.
  *
- * str: the string containing the number.
- * len: Number of characters to parse.
+ * This function converts a substring of numeric characters (specified by `len`)
+ * into an integer. It does not check for null termination and relies on `len`
+ * to determine the length of the string to parse.
+ *
+ * @param str: The string containing the number (non-null terminated).
+ * @param len: The number of characters in `str` to parse.
+ *
+ * @return: The parsed integer value.
  */
 static inline int natoi(const char *str, size_t len)
 {
@@ -45,18 +51,30 @@ static inline int natoi(const char *str, size_t len)
 /**
  * Check if a URL is relative (no scheme and hostname).
  *
- * url: the string containing the URL to check.
+ * A relative URL starts with a "/" but does not include a scheme (e.g., "http://") 
+ * or a hostname. This function determines whether the given URL is relative based
+ * on this criteria.
  *
- * Returns 1 if relative, otherwise 0.
+ * @param url: The string containing the URL to check.
+ *
+ * @return: 1 if the URL is relative, otherwise 0.
  */
 static inline int is_relative(const char *url) { return (*url == '/') ? 1 : 0; }
 
 /**
  * Parse the scheme of a URL by inserting a null terminator after the scheme.
  *
- * str: the string containing the URL to parse. Will be modified.
+ * This function attempts to parse the scheme part of a URL, which is followed by
+ * a colon (":") and two slashes ("//"). If the scheme is present and valid, the
+ * function null-terminates the scheme and returns a pointer to the host part of the URL.
  *
- * Returns a pointer to the hostname on success, otherwise NULL.
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param str: The string containing the URL to parse. This string will be modified
+ *             by null-terminating the scheme portion.
+ *
+ * @return: A pointer to the part of the string after the scheme (i.e., the host),
+ *         or NULL if the scheme is not found or invalid.
  */
 static inline char *parse_scheme(char *str)
 {
@@ -84,11 +102,18 @@ static inline char *parse_scheme(char *str)
  * Find a character in a string, replace it with '\0' and return the next
  * character in the string.
  *
- * str: the string to search in.
- * find: the character to search for.
+ * This function searches for a specific character in the string and, if found,
+ * replaces it with a null terminator ('\0'). It then returns a pointer to the
+ * character immediately after the one found. If the character is not found,
+ * the function returns NULL.
  *
- * Returns a pointer to the character after the one to search for. If not
- * found, NULL is returned.
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param str: The string to search in.
+ * @param find: The character to search for.
+ *
+ * @return: A pointer to the character after the found character, or NULL if
+ *         the character was not found.
  */
 static inline char *find_and_terminate(char *str, char find)
 {
@@ -102,26 +127,80 @@ static inline char *find_and_terminate(char *str, char find)
     return str + 1;
 }
 
-/* Yes, the following functions could be implemented as preprocessor macros
-     instead of inline functions, but I think that this approach will be more
-     clean in this case. */
+/* 
+    Dev Note: Regarding find_fragment(), find_query() and find_path()
+                Yes, the following functions could be implemented as preprocessor macros
+                instead of inline functions, but I think that this approach will be more
+                clean in this case. 
+*/
+
+/**
+ * Find the fragment part of a URL (everything after the '#' character).
+ *
+ * This function searches for the fragment delimiter ('#') in the URL and,
+ * if found, replaces it with a null terminator ('\0'). It returns a pointer
+ * to the part of the string after the fragment delimiter.
+ *
+ * @param str: The URL string to search in.
+ *
+ * @return: A pointer to the part of the string after the fragment part,
+ *         or NULL if no fragment is found.
+ */
 static inline char *find_fragment(char *str) { return find_and_terminate(str, '#'); }
 
+/**
+ * Find the query part of a URL (everything after the '?' character).
+ *
+ * This function searches for the query delimiter ('?') in the URL and, 
+ * if found, replaces it with a null terminator ('\0'). It returns a pointer
+ * to the part of the string after the query delimiter.
+ *
+ * @param str: The URL string to search in.
+ *
+ * @return: A pointer to the part of the string after the query part,
+ *         or NULL if no query is found.
+ */
 static inline char *find_query(char *str) { return find_and_terminate(str, '?'); }
 
+/**
+ * Find the path part of a URL (everything after the '/' character).
+ *
+ * This function searches for the path delimiter ('/') in the URL and,
+ * if found, replaces it with a null terminator ('\0'). It returns a pointer
+ * to the part of the string after the path delimiter.
+ *
+ * @param str: The URL string to search in.
+ *
+ * @return: A pointer to the part of the string after the path part,
+ *         or NULL if no path is found.
+ */
 static inline char *find_path(char *str) { return find_and_terminate(str, '/'); }
 
 /**
- * Parse a URL string to a struct.
+ * @brief Parse a URL into its components.
  *
- * url: pointer to the struct where to store the parsed URL parts.
- * u:   the string containing the URL to be parsed.
+ * This function parses a URL into its components: 
+ *     scheme, host, port, path, query, and fragment. 
+ * The URL string should be in one of the following formats:
  *
- * Returns 0 on success, otherwise -1.
+ * Absolute URL:
+ * scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ] [ "#" fragment ]
+ *
+ * Relative URL:
+ * path [ "?" query ] [ "#" fragment ]
+ *
+ * The following parts will be parsed to the corresponding struct member.
+ *
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param[out] url A pointer to the `yuarel` struct where the parsed values will be stored.
+ * @param[in,out] url_str A pointer to the URL string to be parsed. The string will be modified.
+ *
+ * @return 0 on success, otherwise -1 on error.
  */
-int yuarel_parse(struct yuarel *url, char *u)
+int yuarel_parse(struct yuarel *url, char *url_str)
 {
-    if (NULL == url || NULL == u)
+    if (NULL == url || NULL == url_str)
     {
         return -1;
     }
@@ -129,51 +208,51 @@ int yuarel_parse(struct yuarel *url, char *u)
     memset(url, 0, sizeof(struct yuarel));
 
     /* (Fragment) */
-    url->fragment = find_fragment(u);
+    url->fragment = find_fragment(url_str);
 
     /* (Query) */
-    url->query = find_query(u);
+    url->query = find_query(url_str);
 
     /* Relative URL? Parse scheme and hostname */
-    if (!is_relative(u))
+    if (!is_relative(url_str))
     {
         /* Scheme */
-        url->scheme = u;
-        u = parse_scheme(u);
-        if (u == NULL)
+        url->scheme = url_str;
+        url_str = parse_scheme(url_str);
+        if (url_str == NULL)
         {
             return -1;
         }
 
         /* Host */
-        if ('\0' == *u)
+        if ('\0' == *url_str)
         {
             return -1;
         }
-        url->host = u;
+        url->host = url_str;
 
         /* (Path) */
-        url->path = find_path(u);
+        url->path = find_path(url_str);
 
         /* (Credentials) */
-        u = strchr(url->host, '@');
-        if (NULL != u)
+        url_str = strchr(url->host, '@');
+        if (NULL != url_str)
         {
             /* Missing credentials? */
-            if (u == url->host)
+            if (url_str == url->host)
             {
                 return -1;
             }
 
             url->username = url->host;
-            url->host = u + 1;
-            *u = '\0';
+            url->host = url_str + 1;
+            *url_str = '\0';
 
-            u = strchr(url->username, ':');
-            if (NULL != u)
+            url_str = strchr(url->username, ':');
+            if (NULL != url_str)
             {
-                url->password = u + 1;
-                *u = '\0';
+                url->password = url_str + 1;
+                *url_str = '\0';
             }
         }
 
@@ -184,22 +263,22 @@ int yuarel_parse(struct yuarel *url, char *u)
         }
 
         /* (Port) */
-        u = strchr(url->host, ':');
-        if (NULL != u && (NULL == url->path || u < url->path))
+        url_str = strchr(url->host, ':');
+        if (NULL != url_str && (NULL == url->path || url_str < url->path))
         {
-            *(u++) = '\0';
-            if ('\0' == *u)
+            *(url_str++) = '\0';
+            if ('\0' == *url_str)
             {
                 return -1;
             }
 
             if (url->path)
             {
-                url->port = natoi(u, url->path - u - 1);
+                url->port = natoi(url_str, url->path - url_str - 1);
             }
             else
             {
-                url->port = atoi(u);
+                url->port = atoi(url_str);
             }
         }
 
@@ -212,22 +291,26 @@ int yuarel_parse(struct yuarel *url, char *u)
     else
     {
         /* (Path) */
-        url->path = find_path(u);
+        url->path = find_path(url_str);
     }
 
     return 0;
 }
 
 /**
- * Split a path into several strings.
+ * @brief Split a URL path into parts.
  *
  * No data is copied, the slashed are used as null terminators and then
  * pointers to each path part will be stored in **parts. Double slashes will be
  * treated as one.
  *
- * path: the path to split.
- * parts: a pointer to an array of (char *) where to store the result.
- * max_parts: max number of parts to parse.
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param[in,out] path The path string to split. The string will be modified.
+ * @param[out] parts An array where the resulting path parts will be stored.
+ * @param[in] max_parts The maximum number of parts to parse.
+ *
+ * @return The number of parsed path parts, or -1 on error.
  */
 int yuarel_split_path(char *path, char **parts, int max_parts)
 {
@@ -265,6 +348,27 @@ int yuarel_split_path(char *path, char **parts, int max_parts)
     return i;
 }
 
+/**
+ * @brief Parse a query string into key-value pairs.
+ *
+ * The query string should be a null terminated string of parameters separated by
+ * a delimiter. Each parameter are checked for the equal sign character. If it
+ * appears in the parameter, it will be used as a null terminator and the part
+ * that comes after it will be the value of the parameter.
+ *
+ * No data are copied, the equal sign and delimiters are used as null
+ * terminators and then pointers to each parameter key and value will be stored
+ * in the yuarel_param struct.
+ *
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param[in,out] query The query string to parse. The string will be modified.
+ * @param[in] delimiter The character that separates key-value pairs in the query.
+ * @param[out] params An array where the parsed key-value pairs will be stored.
+ * @param[in] max_params The maximum number of parameters to parse.
+ *
+ * @return The number of parsed parameters, or -1 on error.
+ */
 int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
 {
     int i = 0;
@@ -299,4 +403,58 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
     }
 
     return i;
+}
+
+/**
+ * @brief Decode a percent-encoded URL string in place.
+ * 
+ * This function decodes percent-encoded characters (`%XX`) in the input URL
+ * string and replaces `+` with spaces. The string is modified directly, and 
+ * no additional memory is allocated.
+ *
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param[in,out] str The input string to decode. The string will be modified.
+ *
+ * @return The modified input string (same pointer as `str`).
+ */
+char *yuarel_url_decode(char *str)
+{
+    // Hex decoding utilities
+#define YUAREL_URL_DECODE_IS_HEX(ch) (('0' <= (ch) && (ch) <= '9') || ('a' <= (ch) && (ch) <= 'f') || ('A' <= (ch) && (ch) <= 'F'))
+#define YUAREL_URL_DECODE_PARSE_HEX(ch) (('0' <= (ch) && (ch) <= '9') ? (ch) - '0' : ('a' <= (ch) && (ch) <= 'f') ? 10 + (ch) - 'a' : ('A' <= (ch) && (ch) <= 'F') ? 10 + (ch) - 'A' : 0)
+
+    const char *read_ptr = str;
+    char *write_ptr = str;
+
+    while (*read_ptr)
+    {
+        if (read_ptr[0] == '+')
+        {
+            // '+' is a space in URL-encoded strings
+            *write_ptr = ' ';
+            write_ptr += 1;
+            read_ptr += 1;
+        }
+        else if (read_ptr[0] == '%' && YUAREL_URL_DECODE_IS_HEX(read_ptr[1]) && YUAREL_URL_DECODE_IS_HEX(read_ptr[2]))
+        {
+            // Decode percent encoded hex and skip past the two hex character
+            *write_ptr = YUAREL_URL_DECODE_PARSE_HEX(read_ptr[1]) << 4 | YUAREL_URL_DECODE_PARSE_HEX(read_ptr[2]);
+            write_ptr += 1;
+            read_ptr += 3;
+        }
+        else
+        {
+            // Regular character, copy as is
+            *write_ptr = *read_ptr;
+            write_ptr += 1;
+            read_ptr += 1;
+        }
+    }
+#undef YUAREL_URL_DECODE_IS_HEX
+#undef YUAREL_URL_DECODE_PARSE_HEX
+
+    // Null-terminate the string
+    *write_ptr = '\0';
+    return str;
 }
