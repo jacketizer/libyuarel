@@ -209,6 +209,62 @@ static const char *test_parse_http_url_ok()
     return 0;
 }
 
+static const char *test_parse_http_url_ipv6_ok()
+{
+    int rc;
+    struct yuarel url;
+    char *url_string;
+
+    /* Minimal URL with IPv6 hostname */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("minimal http URL with IPv6 hostname", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+
+    /* With IPv6 hostname and path (/) */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]/");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("With IPv6 hostname and path ('/')", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, "", NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and path */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]/path");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and path", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, "path", NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and port */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]:80");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and port", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 80, NULL, NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and credentials */
+    url_string = strdup("http://u:p@[3ffe:2a00:100:7031::1]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and credentials", -1 != rc);
+    assert_struct(url, "http", "u", "p", "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+
+    /* With IPv6 hostname, port and path */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]:8080/port/and/path");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname, port and path", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 8080, "port/and/path", NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and empty credentials */
+    url_string = strdup("http://:@[3ffe:2a00:100:7031::1]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and empty credentials", -1 != rc);
+    assert_struct(url, "http", "", "", "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+    free(url_string);
+
+    return 0;
+}
+
 static const char *test_parse_http_rel_url_ok()
 {
     int rc;
@@ -457,7 +513,7 @@ static const char *test_parse_query_ok()
     mu_silent_assert("first param key should be 'a'", 0 == strcmp("a", params[0].key));
     mu_silent_assert("first param val should be 'b'", 0 == strcmp("b", params[0].val));
     free(q);
-    
+
     /* Key Value with present but empty value */
     q = strdup("a=b&f=&c=d");
     rc = yuarel_parse_query(q, '&', params, 3);
@@ -556,6 +612,9 @@ static const char *all_tests()
 {
     mu_group("yuarel_parse() with an HTTP URL");
     mu_run_test(test_parse_http_url_ok);
+
+    mu_group("yuarel_parse() with an HTTP URL (ipv6) ");
+    mu_run_test(test_parse_http_url_ipv6_ok);
 
     mu_group("yuarel_parse() with an relative URL");
     mu_run_test(test_parse_http_rel_url_ok);

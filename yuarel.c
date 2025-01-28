@@ -263,7 +263,48 @@ int yuarel_parse(struct yuarel *url, char *url_str)
         }
 
         /* (Port) */
-        url_str = strchr(url->host, ':');
+        if ('[' == url->host[0])
+        {
+            /* IPv6 Literal */
+            // If hostname starts with square bracket, it is IPv6 literal
+            // example:
+            // http://[1080:0:0:0:8:800:200C:417A]:80/index.html
+            // http://[3ffe:2a00:100:7031::1]
+            // http://[::192.9.5.5]/ipng
+            url->host++;
+
+            /* Locate end of IPv6 Literal marker */
+            url_str = strchr(url->host, ']');
+            if (NULL == url_str)
+            {
+                /* Missing end ']' marker */
+                return -1;
+            }
+
+            /* Null terminate IPv6 host literal (In place of ']') */
+            *url_str = '\0';
+            
+            /* Check if next character is ':' is present. 
+                * Which would indicate port number is present */
+            url_str++;
+            if ('\0' == *url_str)
+            {
+                /* Already end of host string. No port number present */
+                url_str = NULL;
+            }
+            else if (':' != *url_str)
+            {
+                /* Port number delimiter is missing. Invalid. */
+                return -1;
+            }
+        }
+        else
+        {
+            /* Check for port number delimiter */
+            // example: http://192.156.1.1:80 ('<HOST>:<PORT>')
+            url_str = strchr(url->host, ':');
+        }
+
         if (NULL != url_str && (NULL == url->path || url_str < url->path))
         {
             *(url_str++) = '\0';
