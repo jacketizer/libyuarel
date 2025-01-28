@@ -6,9 +6,9 @@ OBJ_FILES := $(patsubst %.c, %.o, $(SRC_FILES))
 # MAJOR version when you make incompatible API changes
 VERSION_MAJOR := 1
 # MINOR version when you add functionality in a backward compatible manner
-VERSION_MINOR := 1
+VERSION_MINOR := 2
 # PATCH version when you make backward compatible bug fixes
-VERSION_PATCH := 4
+VERSION_PATCH := 0
 
 VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 LIBNAME := yuarel
