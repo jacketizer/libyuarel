@@ -214,125 +214,133 @@ int yuarel_parse(struct yuarel *url, char *url_str)
     url->query = find_query(url_str);
 
     /* Relative URL? Parse scheme and hostname */
-    if (!is_relative(url_str))
+    if (is_relative(url_str))
     {
-        /* Scheme */
-        url->scheme = url_str;
-        url_str = parse_scheme(url_str);
-        if (url_str == NULL)
-        {
-            return -1;
-        }
-
-        /* Host */
-        if ('\0' == *url_str)
-        {
-            return -1;
-        }
-        url->host = url_str;
-
-        /* (Path) */
+        /* Relative (Path) Found */
         url->path = find_path(url_str);
+        return 0;
+    }
 
-        /* (Credentials) */
-        url_str = strchr(url->host, '@');
+    /* Scheme */
+    url->scheme = url_str;
+    url_str = parse_scheme(url_str);
+    if (url_str == NULL)
+    {
+        /* Scheme Missing */
+        return -1;
+    }
+
+    /* Check if host is omitted but path is provided (e.g. File URI) */
+    if ('/' == *url_str)
+    {
+        /* URI Omits Hostname. Record only path */
+        url->path = url_str;
+        return 0;
+    }
+
+    /* Host */
+    if ('\0' == *url_str)
+    {
+        return -1;
+    }
+    url->host = url_str;
+
+    /* (Path) */
+    url->path = find_path(url_str);
+
+    /* (Credentials) */
+    url_str = strchr(url->host, '@');
+    if (NULL != url_str)
+    {
+        /* Missing credentials? */
+        if (url_str == url->host)
+        {
+            return -1;
+        }
+
+        url->username = url->host;
+        url->host = url_str + 1;
+        *url_str = '\0';
+
+        url_str = strchr(url->username, ':');
         if (NULL != url_str)
         {
-            /* Missing credentials? */
-            if (url_str == url->host)
-            {
-                return -1;
-            }
-
-            url->username = url->host;
-            url->host = url_str + 1;
+            url->password = url_str + 1;
             *url_str = '\0';
-
-            url_str = strchr(url->username, ':');
-            if (NULL != url_str)
-            {
-                url->password = url_str + 1;
-                *url_str = '\0';
-            }
         }
+    }
 
-        /* Missing hostname? */
-        if ('\0' == *url->host)
+    /* Missing hostname? */
+    if ('\0' == *url->host)
+    {
+        return -1;
+    }
+
+    /* (Port) */
+    if ('[' == url->host[0])
+    {
+        /* IPv6 Literal */
+        // If hostname starts with square bracket, it is IPv6 literal
+        // example:
+        // http://[1080:0:0:0:8:800:200C:417A]:80/index.html
+        // http://[3ffe:2a00:100:7031::1]
+        // http://[::192.9.5.5]/ipng
+        url->host++;
+
+        /* Locate end of IPv6 Literal marker */
+        url_str = strchr(url->host, ']');
+        if (NULL == url_str)
         {
+            /* Missing end ']' marker */
             return -1;
         }
 
-        /* (Port) */
-        if ('[' == url->host[0])
+        /* Null terminate IPv6 host literal (In place of ']') */
+        *url_str = '\0';
+
+        /* Check if next character is ':' is present.
+         * Which would indicate port number is present */
+        url_str++;
+        if ('\0' == *url_str)
         {
-            /* IPv6 Literal */
-            // If hostname starts with square bracket, it is IPv6 literal
-            // example:
-            // http://[1080:0:0:0:8:800:200C:417A]:80/index.html
-            // http://[3ffe:2a00:100:7031::1]
-            // http://[::192.9.5.5]/ipng
-            url->host++;
-
-            /* Locate end of IPv6 Literal marker */
-            url_str = strchr(url->host, ']');
-            if (NULL == url_str)
-            {
-                /* Missing end ']' marker */
-                return -1;
-            }
-
-            /* Null terminate IPv6 host literal (In place of ']') */
-            *url_str = '\0';
-            
-            /* Check if next character is ':' is present. 
-                * Which would indicate port number is present */
-            url_str++;
-            if ('\0' == *url_str)
-            {
-                /* Already end of host string. No port number present */
-                url_str = NULL;
-            }
-            else if (':' != *url_str)
-            {
-                /* Port number delimiter is missing. Invalid. */
-                return -1;
-            }
+            /* Already end of host string. No port number present */
+            url_str = NULL;
         }
-        else
+        else if (':' != *url_str)
         {
-            /* Check for port number delimiter */
-            // example: http://192.156.1.1:80 ('<HOST>:<PORT>')
-            url_str = strchr(url->host, ':');
-        }
-
-        if (NULL != url_str && (NULL == url->path || url_str < url->path))
-        {
-            *(url_str++) = '\0';
-            if ('\0' == *url_str)
-            {
-                return -1;
-            }
-
-            if (url->path)
-            {
-                url->port = natoi(url_str, url->path - url_str - 1);
-            }
-            else
-            {
-                url->port = atoi(url_str);
-            }
-        }
-
-        /* Missing hostname? */
-        if ('\0' == *url->host)
-        {
+            /* Port number delimiter is missing. Invalid. */
             return -1;
         }
     }
     else
     {
-        /* (Path) */
-        url->path = find_path(url_str);
+        /* Check for port number delimiter */
+        // example: http://192.156.1.1:80 ('<HOST>:<PORT>')
+        url_str = strchr(url->host, ':');
+    }
+
+    if (NULL != url_str && (NULL == url->path || url_str < url->path))
+    {
+        *(url_str++) = '\0';
+        if ('\0' == *url_str)
+        {
+            return -1;
+        }
+
+        if (url->path)
+        {
+            url->port = natoi(url_str, url->path - url_str - 1);
+        }
+        else
+        {
+            url->port = atoi(url_str);
+        }
+    }
+
+    /* Missing hostname? */
+    if ('\0' == *url->host)
+    {
+        return -1;
     }
 
     return 0;

@@ -1,7 +1,7 @@
 libyuarel
 =========
 
-<versionBadge>![Version 1.1.3](https://img.shields.io/badge/version-1.1.3-blue.svg)</versionBadge>
+<versionBadge>![Version 1.1.4](https://img.shields.io/badge/version-1.1.4-blue.svg)</versionBadge>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
 [![CI/CD Status Badge](https://github.com/mofosyne/libyuarel/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/mofosyne/libyuarel/actions)
