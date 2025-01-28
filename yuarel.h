@@ -1,5 +1,12 @@
 /**
- * Copyright (C) 2016 Jack Engqvist Johansson
+ * @file yuarel.h
+ * @brief URL parsing and decoding utilities.
+ *
+ * This file provides functions and structures for parsing and manipulating URLs.
+ * It includes functions for parsing a URL into components, splitting paths,
+ * parsing query strings, and decoding percent-encoded URL strings.
+ *
+ * @copyright Copyright (C) 2016 Jack Engqvist Johansson
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +26,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 #ifndef INC_YUAREL_H
 #define INC_YUAREL_H
 
@@ -28,7 +36,8 @@ extern "C"
 #endif
 
 /**
- * The struct where the parsed values will be stored:
+ * @struct yuarel
+ * @brief Structure that stores parsed URL components.
  *
  * scheme ":" [ "//" ] [ username ":" password "@" ] host [ ":" port ] [ "/" ] [ path ] [ "?" query ]
  *
@@ -37,26 +46,34 @@ extern "C"
  */
 struct yuarel
 {
-    char *scheme;   /* scheme, without ":" and "//" */
-    char *username; /* username, default: NULL */
-    char *password; /* password, default: NULL */
-    char *host;     /* hostname or IP address */
-    int port;       /* port, default: 0 */
-    char *path;     /* path, without leading "/", default: NULL */
-    char *query;    /* query, default: NULL */
-    char *fragment; /* fragment, default: NULL */
-};
-
-/* A struct to hold the query string parameter values. */
-struct yuarel_param
-{
-    char *key;
-    char *val;
+    char *scheme;   /**< @brief Scheme, without ":" and "//" */
+    char *username; /**< @brief Username, default: NULL */
+    char *password; /**< @brief Password, default: NULL */
+    char *host;     /**< @brief Hostname or IP address */
+    int port;       /**< @brief Port, default: 0 */
+    char *path;     /**< @brief Path, without leading "/", default: NULL */
+    char *query;    /**< @brief Query string, default: NULL */
+    char *fragment; /**< @brief Fragment identifier, default: NULL */
 };
 
 /**
- * Parse a URL to a struct.
+ * @struct yuarel_param
+ * @brief Structure for holding query string parameters.
  *
+ * This structure is used to store key-value pairs representing query
+ * parameters in the URL's query string.
+ */
+struct yuarel_param
+{
+    char *key; /**< @brief Key of the query parameter */
+    char *val; /**< @brief Value of the query parameter */
+};
+
+/**
+ * @brief Parse a URL into its components.
+ *
+ * This function parses a URL into its components:
+ *     scheme, host, port, path, query, and fragment.
  * The URL string should be in one of the following formats:
  *
  * Absolute URL:
@@ -67,31 +84,34 @@ struct yuarel_param
  *
  * The following parts will be parsed to the corresponding struct member.
  *
- * *url:     a pointer to the struct where to store the parsed values.
- * *url_str: a pointer to the url to be parsed (null terminated). The string
- *           will be modified.
+ * @warning: Modifies the input string as part of the parsing process.
  *
- * Returns 0 on success, otherwise -1.
+ * @param[out] url A pointer to the `yuarel` struct where the parsed values will be stored.
+ * @param[in,out] url_str A pointer to the URL string to be parsed. The string will be modified.
+ *
+ * @return 0 on success, otherwise -1 on error.
  */
 extern int yuarel_parse(struct yuarel *url, char *url_str);
 
 /**
- * Split a path into several strings.
+ * @brief Split a URL path into parts.
  *
  * No data is copied, the slashed are used as null terminators and then
  * pointers to each path part will be stored in **parts. Double slashes will be
  * treated as one.
  *
- * *path:     the path to split. The string will be modified.
- * **parts:   a pointer to an array of (char *) where to store the result.
- * max_parts: max number of parts to parse.
+ * @warning: Modifies the input string as part of the parsing process.
  *
- * Returns the number of parsed items. -1 on error.
+ * @param[in,out] path The path string to split. The string will be modified.
+ * @param[out] parts An array where the resulting path parts will be stored.
+ * @param[in] max_parts The maximum number of parts to parse.
+ *
+ * @return The number of parsed path parts, or -1 on error.
  */
 extern int yuarel_split_path(char *path, char **parts, int max_parts);
 
 /**
- * Parse a query string into a key/value struct.
+ * @brief Parse a query string into key-value pairs.
  *
  * The query string should be a null terminated string of parameters separated by
  * a delimiter. Each parameter are checked for the equal sign character. If it
@@ -102,14 +122,31 @@ extern int yuarel_split_path(char *path, char **parts, int max_parts);
  * terminators and then pointers to each parameter key and value will be stored
  * in the yuarel_param struct.
  *
- * *query:     the query string to parse. The string will be modified.
- * delimiter:  the character that separates the key/value pairs from each other
- * *params:    an array of (struct yuarel_param) where to store the result.
- * max_values: max number of parameters to parse.
+ * @warning: Modifies the input string as part of the parsing process.
  *
- * Returns the number of parsed items. -1 on error.
+ * @param[in,out] query The query string to parse. The string will be modified.
+ * @param[in] delimiter The character that separates key-value pairs in the query.
+ * @param[out] params An array where the parsed key-value pairs will be stored.
+ * @param[in] max_params The maximum number of parameters to parse.
+ *
+ * @return The number of parsed parameters, or -1 on error.
  */
 extern int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params);
+
+/**
+ * @brief Decode a percent-encoded URL string in place.
+ *
+ * This function decodes percent-encoded characters (`%XX`) in the input URL
+ * string and replaces `+` with spaces. The string is modified directly, and
+ * no additional memory is allocated.
+ *
+ * @warning: Modifies the input string as part of the parsing process.
+ *
+ * @param[in,out] str The input string to decode. The string will be modified.
+ *
+ * @return The modified input string (same pointer as `str`).
+ */
+extern char *yuarel_url_decode(char *str);
 
 #ifdef __cplusplus
 }

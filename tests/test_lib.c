@@ -4,6 +4,25 @@
 #include <string.h>
 #include <yuarel.h>
 
+#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200809L
+// https://stackoverflow.com/questions/26284110/strdup-confused-about-warnings-implicit-declaration-makes-pointer-with
+// https://stackoverflow.com/questions/12575267/which-macro-is-being-used-with-strdup-on-linux
+char *strdup(const char *src)
+{
+    // Space for length plus nul
+    char *dst = malloc(strlen(src) + 1);
+    if (dst == NULL)
+    {
+        // No memory
+        return NULL;
+    }
+    // Copy the characters
+    strcpy(dst, src);
+    // Return the new string
+    return dst;
+}
+#endif
+
 int tests_run;
 
 static int strcmp_wrap(const char *str, const char *str2)
@@ -34,7 +53,7 @@ static int strcmp_wrap(const char *str, const char *str2)
     mu_silent_assert("should set the query attribute correctly", 0 == strcmp_wrap(as_url.query, as_query));                                                                                            \
     mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp_wrap(as_url.fragment, as_fragment));
 
-static unsigned char *test_parse_http_url_ok()
+static const char *test_parse_http_url_ok()
 {
     int rc;
     struct yuarel url;
@@ -190,7 +209,63 @@ static unsigned char *test_parse_http_url_ok()
     return 0;
 }
 
-static unsigned char *test_parse_http_rel_url_ok()
+static const char *test_parse_http_url_ipv6_ok()
+{
+    int rc;
+    struct yuarel url;
+    char *url_string;
+
+    /* Minimal URL with IPv6 hostname */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("minimal http URL with IPv6 hostname", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+
+    /* With IPv6 hostname and path (/) */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]/");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("With IPv6 hostname and path ('/')", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, "", NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and path */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]/path");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and path", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 0, "path", NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and port */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]:80");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and port", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 80, NULL, NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and credentials */
+    url_string = strdup("http://u:p@[3ffe:2a00:100:7031::1]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and credentials", -1 != rc);
+    assert_struct(url, "http", "u", "p", "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+
+    /* With IPv6 hostname, port and path */
+    url_string = strdup("http://[3ffe:2a00:100:7031::1]:8080/port/and/path");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname, port and path", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "3ffe:2a00:100:7031::1", 8080, "port/and/path", NULL, NULL);
+    free(url_string);
+
+    /* With IPv6 hostname and empty credentials */
+    url_string = strdup("http://:@[3ffe:2a00:100:7031::1]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with IPv6 hostname and empty credentials", -1 != rc);
+    assert_struct(url, "http", "", "", "3ffe:2a00:100:7031::1", 0, NULL, NULL, NULL);
+    free(url_string);
+
+    return 0;
+}
+
+static const char *test_parse_http_rel_url_ok()
 {
     int rc;
     struct yuarel url;
@@ -234,7 +309,7 @@ static unsigned char *test_parse_http_rel_url_ok()
     return 0;
 }
 
-static unsigned char *test_parse_url_fail()
+static const char *test_parse_url_fail()
 {
     int rc;
     struct yuarel url;
@@ -285,7 +360,44 @@ static unsigned char *test_parse_url_fail()
     return 0;
 }
 
-static unsigned char *test_split_path_ok()
+static const char *test_parse_file_url_ok()
+{
+    int rc;
+    struct yuarel url;
+    char *url_string;
+
+    /* Minimal file URL */
+    url_string = strdup("file:///home/john/file.txt");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("minimal file URL", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/file.txt", NULL, NULL);
+    free(url_string);
+
+    /* File URL with directory */
+    url_string = strdup("file:///home/john/");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("file URL with directory", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/", NULL, NULL);
+    free(url_string);
+
+    /* File URL with path */
+    url_string = strdup("file:///home/john/file.txt");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("file URL with path", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/file.txt", NULL, NULL);
+    free(url_string);
+
+    /* File URL with absolute path */
+    url_string = strdup("file:///absolute/path/to/file.txt");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("file URL with absolute path", -1 != rc);
+    assert_struct(url, "file", NULL, NULL, NULL, 0, "/absolute/path/to/file.txt", NULL, NULL);
+    free(url_string);
+
+    return 0;
+}
+
+static const char *test_split_path_ok()
 {
     int rc;
     char *path;
@@ -331,7 +443,7 @@ static unsigned char *test_split_path_ok()
     return 0;
 }
 
-static unsigned char *test_parse_query_ok()
+static const char *test_parse_query_ok()
 {
     int rc;
     char *q;
@@ -431,50 +543,115 @@ static unsigned char *test_parse_query_ok()
     mu_silent_assert("third param val should be NULL", NULL == params[2].val);
     free(q);
 
+    /* More kv in querystring than max parameters */
+    q = strdup("a=b&c=d");
+    rc = yuarel_parse_query(q, '&', params, 1);
+    mu_assert("more kv in querystring than max parameters", 1 == rc);
+    mu_silent_assert("first param key should be 'a'", 0 == strcmp("a", params[0].key));
+    mu_silent_assert("first param val should be 'b'", 0 == strcmp("b", params[0].val));
+    free(q);
+
+    /* Key Value with present but empty value */
+    q = strdup("a=b&f=&c=d");
+    rc = yuarel_parse_query(q, '&', params, 3);
+    mu_assert("key Value with present but empty value", 3 == rc);
+    mu_silent_assert("first param key should be 'a'", 0 == strcmp("a", params[0].key));
+    mu_silent_assert("first param val should be 'b'", 0 == strcmp("b", params[0].val));
+    mu_silent_assert("first param key should be 'f'", 0 == strcmp("f", params[1].key));
+    mu_silent_assert("first param key should be '' ", 0 == strcmp("", params[1].val));
+    mu_silent_assert("first param key should be 'c'", 0 == strcmp("c", params[2].key));
+    mu_silent_assert("first param val should be 'd'", 0 == strcmp("d", params[2].val));
+    free(q);
+
     return 0;
 }
 
-static unsigned char *test_parse_file_url_ok()
+static const char *yuarel_url_decode_ok()
 {
-    int rc;
-    struct yuarel url;
-    char *url_string;
+    char *q;
 
-    /* Minimal file URL */
-    url_string = strdup("file:///home/john/file.txt");
-    rc = yuarel_parse(&url, url_string);
-    mu_assert("minimal file URL", -1 != rc);
-    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/file.txt", NULL, NULL);
-    free(url_string);
+    // Empty String
+    q = strdup("");
+    q = yuarel_url_decode(q);
+    mu_assert("empty string do nothing", 0 == strcmp("", q));
+    free(q);
 
-    /* File URL with directory */
-    url_string = strdup("file:///home/john/");
-    rc = yuarel_parse(&url, url_string);
-    mu_assert("file URL with directory", -1 != rc);
-    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/", NULL, NULL);
-    free(url_string);
+    // Simple percent encoding
+    q = strdup("Hello%20World");
+    q = yuarel_url_decode(q);
+    mu_assert("percent encoding %20 as space", 0 == strcmp("Hello World", q));
+    free(q);
 
-    /* File URL with path */
-    url_string = strdup("file:///home/john/file.txt");
-    rc = yuarel_parse(&url, url_string);
-    mu_assert("file URL with path", -1 != rc);
-    assert_struct(url, "file", NULL, NULL, NULL, 0, "/home/john/file.txt", NULL, NULL);
-    free(url_string);
+    // Multiple percent-encoded characters
+    q = strdup("Hello%20World%21");
+    q = yuarel_url_decode(q);
+    mu_assert("multiple percent encoding", 0 == strcmp("Hello World!", q));
+    free(q);
 
-    /* File URL with absolute path */
-    url_string = strdup("file:///absolute/path/to/file.txt");
-    rc = yuarel_parse(&url, url_string);
-    mu_assert("file URL with absolute path", -1 != rc);
-    assert_struct(url, "file", NULL, NULL, NULL, 0, "/absolute/path/to/file.txt", NULL, NULL);
-    free(url_string);
+    // Plus as space (x-www-form-urlencoded)
+    q = strdup("Hello+World");
+    q = yuarel_url_decode(q);
+    mu_assert("plus as space", 0 == strcmp("Hello World", q));
+    free(q);
+
+    // Malformed percent encoding (invalid hex)
+    q = strdup("abc%xy");
+    q = yuarel_url_decode(q);
+    mu_assert("invalid percent encoding", 0 == strcmp("abc%xy", q));
+    free(q);
+
+    // Decoding multiple valid percent-encoded characters
+    q = strdup("abc%20def%3A%2Fgh");
+    q = yuarel_url_decode(q);
+    mu_assert("decode multiple percent encodings", 0 == strcmp("abc def:/gh", q));
+    free(q);
+
+    // Percent encoding with uppercase hex
+    q = strdup("Hex%2DTest");
+    q = yuarel_url_decode(q);
+    mu_assert("percent encoding with uppercase hex", 0 == strcmp("Hex-Test", q));
+    free(q);
+
+    // Percent encoding with lowercase hex
+    q = strdup("Hello%3Aworld");
+    q = yuarel_url_decode(q);
+    mu_assert("percent encoding with lowercase hex", 0 == strcmp("Hello:world", q));
+    free(q);
+
+    // String with special characters
+    q = strdup("Hello%2C%20how%20are%20you%3F");
+    q = yuarel_url_decode(q);
+    mu_assert("string with special characters", 0 == strcmp("Hello, how are you?", q));
+    free(q);
+
+    // URL-encoded key-value pair
+    q = strdup("key%3Dvalue");
+    q = yuarel_url_decode(q);
+    mu_assert("decode key-value pair", 0 == strcmp("key=value", q));
+    free(q);
+
+    // Long input string with mixed encodings
+    q = strdup("long%20test%20with%20multiple%20encodings%20%3D%20and%20spaces");
+    q = yuarel_url_decode(q);
+    mu_assert("long input with mixed encodings", 0 == strcmp("long test with multiple encodings = and spaces", q));
+    free(q);
+
+    // Percent encoding with multiple consecutive encodings
+    q = strdup("Hello%%20World");
+    q = yuarel_url_decode(q);
+    mu_assert("multiple consecutive percent encodings", 0 == strcmp("Hello% World", q));
+    free(q);
 
     return 0;
 }
 
-static unsigned char *all_tests()
+static const char *all_tests()
 {
     mu_group("yuarel_parse() with an HTTP URL");
     mu_run_test(test_parse_http_url_ok);
+
+    mu_group("yuarel_parse() with an HTTP URL (ipv6) ");
+    mu_run_test(test_parse_http_url_ipv6_ok);
 
     mu_group("yuarel_parse() with an relative URL");
     mu_run_test(test_parse_http_rel_url_ok);
@@ -482,23 +659,25 @@ static unsigned char *all_tests()
     mu_group("yuarel_parse() with faulty values");
     mu_run_test(test_parse_url_fail);
 
+    mu_group("yuarel_parse() with file URL");
+    mu_run_test(test_parse_file_url_ok);
+
     mu_group("yuarel_split_path()");
     mu_run_test(test_split_path_ok);
 
     mu_group("yuarel_parse_query()");
     mu_run_test(test_parse_query_ok);
 
-    mu_group("test_parse_file_url_ok()");
-    mu_run_test(test_parse_file_url_ok);
+    mu_group("yuarel_url_decode()");
+    mu_run_test(yuarel_url_decode_ok);
 
     return 0;
 }
 
 int main(void)
 {
-    unsigned char *result;
+    const char *result = all_tests();
 
-    result = all_tests();
     if (result != 0)
     {
         exit(EXIT_FAILURE);
