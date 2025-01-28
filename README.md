@@ -70,14 +70,18 @@ Struct values:
         host:           localhost
         port:           8989
         path:           path/to/test
-        query:          query=yes&param1=no
+        query:          flag1&query=yes&flag2&param1=no&flag3&greet=hello%20world
         fragment:       frag=1
 
 Path parts: 'path', 'to', 'test'
 
 Query string parameters:
+        greet: hello world
+        flag3: (null)
         param1: no
+        flag2: (null)
         query: yes
+        flag1: (null)
 ```
 
 If you see this error
@@ -100,24 +104,26 @@ as explained in previous section.
 The struct that holds the parsed URL looks like this:
 
 ```C
-struct yuarel {
-	char *scheme;	/* scheme, without ":" and "//" */
-	char *username;	/* username, default: NULL */
-	char *password;	/* password, default: NULL */
-	char *host;	/* hostname or IP address */
-	int port;	/* port, default: 0 */
-	char *path;	/* path, without leading "/", default: NULL */
-	char *query; 	/* query, default: NULL */
-	char *fragment;	/* fragment, default: NULL */
+struct yuarel
+{
+    char *scheme;   /**< @brief Scheme, without ":" and "//" */
+    char *username; /**< @brief Username, default: NULL */
+    char *password; /**< @brief Password, default: NULL */
+    char *host;     /**< @brief Hostname or IP address */
+    int port;       /**< @brief Port, default: 0 */
+    char *path;     /**< @brief Path, without leading "/", default: NULL */
+    char *query;    /**< @brief Query string, default: NULL */
+    char *fragment; /**< @brief Fragment identifier, default: NULL */
 };
 ```
 
 The struct that holds a parsed query string parameter looks like this:
 
 ```C
-struct yuarel_param {
-	char *key;
-	char *val;
+struct yuarel_param
+{
+    char *key; /**< @brief Key of the query parameter */
+    char *val; /**< @brief Value of the query parameter */
 };
 ```
 
@@ -209,7 +215,7 @@ int main(void)
     int p = 0;
     struct yuarel url = {0};
     char *parts[MAX_PART_COUNT] = {NULL};
-    struct yuarel_param params[MAX_PARAM_COUNT];
+    struct yuarel_param params[MAX_PARAM_COUNT] = {0};
     char url_string[] = "http://localhost:8989/path/to/test?flag1&query=yes&flag2&param1=no&flag3&greet=hello%20world#frag=1";
 
     if (-1 == yuarel_parse(&url, url_string))
@@ -239,6 +245,7 @@ int main(void)
     p = yuarel_parse_query(url.query, '&', params, MAX_PARAM_COUNT);
     while (p-- > 0)
     {
+        yuarel_url_decode(params[p].key);
         yuarel_url_decode(params[p].val);
         printf("\t%s: %s\n", params[p].key, params[p].val);
     }

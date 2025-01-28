@@ -9,7 +9,7 @@ int main(void)
     int p = 0;
     struct yuarel url = {0};
     char *parts[MAX_PART_COUNT] = {NULL};
-    struct yuarel_param params[MAX_PARAM_COUNT];
+    struct yuarel_param params[MAX_PARAM_COUNT] = {0};
     char url_string[] = "http://localhost:8989/path/to/test?flag1&query=yes&flag2&param1=no&flag3&greet=hello%20world#frag=1";
 
     if (-1 == yuarel_parse(&url, url_string))
@@ -39,6 +39,7 @@ int main(void)
     p = yuarel_parse_query(url.query, '&', params, MAX_PARAM_COUNT);
     while (p-- > 0)
     {
+        yuarel_url_decode(params[p].key);
         yuarel_url_decode(params[p].val);
         printf("\t%s: %s\n", params[p].key, params[p].val);
     }
