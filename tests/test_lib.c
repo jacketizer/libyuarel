@@ -450,6 +450,26 @@ static const char *test_parse_query_ok()
     mu_silent_assert("third param val should be NULL", NULL == params[2].val);
     free(q);
 
+    /* More kv in querystring than max parameters */
+    q = strdup("a=b&c=d");
+    rc = yuarel_parse_query(q, '&', params, 1);
+    mu_assert("more kv in querystring than max parameters", 1 == rc);
+    mu_silent_assert("first param key should be 'a'", 0 == strcmp("a", params[0].key));
+    mu_silent_assert("first param val should be 'b'", 0 == strcmp("b", params[0].val));
+    free(q);
+    
+    /* Key Value with present but empty value */
+    q = strdup("a=b&f=&c=d");
+    rc = yuarel_parse_query(q, '&', params, 3);
+    mu_assert("key Value with present but empty value", 3 == rc);
+    mu_silent_assert("first param key should be 'a'", 0 == strcmp("a", params[0].key));
+    mu_silent_assert("first param val should be 'b'", 0 == strcmp("b", params[0].val));
+    mu_silent_assert("first param key should be 'f'", 0 == strcmp("f", params[1].key));
+    mu_silent_assert("first param key should be '' ", 0 == strcmp("", params[1].val));
+    mu_silent_assert("first param key should be 'c'", 0 == strcmp("c", params[2].key));
+    mu_silent_assert("first param val should be 'd'", 0 == strcmp("d", params[2].val));
+    free(q);
+
     return 0;
 }
 

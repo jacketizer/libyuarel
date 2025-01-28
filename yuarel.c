@@ -371,38 +371,50 @@ int yuarel_split_path(char *path, char **parts, int max_parts)
  */
 int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
 {
-    int i = 0;
-
     if (NULL == query || '\0' == *query)
     {
         return -1;
     }
 
-    params[i++].key = query;
-    while (i < max_params && NULL != (query = strchr(query, delimiter)))
+    int param_count = 0;
+    while (param_count < max_params)
     {
-        *query = '\0';
-        params[i].key = ++query;
-        params[i].val = NULL;
-
-        /* Go back and split previous param */
-        if (i > 0)
+        char *curr_key_ptr = query;
+        char *curr_end_ptr = strchr(curr_key_ptr, delimiter);
+        if (curr_end_ptr != NULL)
         {
-            if ((params[i - 1].val = strchr(params[i - 1].key, '=')) != NULL)
-            {
-                *(params[i - 1].val)++ = '\0';
-            }
+            // There will be more kv pairs ahead so zero terminate this kv
+            *curr_end_ptr = '\0';
         }
-        i++;
+
+        /* Write KV parameter */
+        params[param_count].key = curr_key_ptr;
+        char *val_delim = strchr(curr_key_ptr, '=');
+        if (val_delim != NULL)
+        {
+            /* Value Is Present. Split and record */
+            *val_delim = '\0';
+            params[param_count].val = val_delim + 1;
+        }
+        else
+        {
+            /* Value Not Present. Mark as empty */
+            params[param_count].val = NULL;
+        }
+        param_count++;
+
+        /* Handle next KV pair if present */
+        if (curr_end_ptr == NULL)
+        {
+            /* No more kv pairs ahead. Finish up */
+            break;
+        }
+
+        /* There will be more kv pairs ahead */
+        query = curr_end_ptr + 1;
     }
 
-    /* Go back and split last param */
-    if ((params[i - 1].val = strchr(params[i - 1].key, '=')) != NULL)
-    {
-        *(params[i - 1].val)++ = '\0';
-    }
-
-    return i;
+    return param_count;
 }
 
 /**

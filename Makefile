@@ -2,9 +2,14 @@ CUR_DIR := $(shell pwd)
 SRC_FILES := yuarel.c
 OBJ_FILES := $(patsubst %.c, %.o, $(SRC_FILES))
 
+# Semantic Versioning 2.0.0 https://semver.org/
+# MAJOR version when you make incompatible API changes
 VERSION_MAJOR := 1
+# MINOR version when you add functionality in a backward compatible manner
 VERSION_MINOR := 1
-VERSION_PATCH := 1
+# PATCH version when you make backward compatible bug fixes
+VERSION_PATCH := 2
+
 VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 LIBNAME := yuarel
 PKG_NAME := lib$(LIBNAME)-$(VERSION)
