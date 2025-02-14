@@ -16,7 +16,7 @@ PKG_NAME := lib$(LIBNAME)-$(VERSION)
 
 CC := gcc
 AR := ar
-CFLAGS := -c -fPIC -g -Wall -Werror -std=c99 -pedantic
+CFLAGS := -c -fPIC -g -Wall -Werror -std=c99 -pedantic -Wunused -Wlogical-op -Wno-uninitialized -Wextra -Wformat-security -Wno-init-self -Wwrite-strings -Wshift-count-overflow -Wdeclaration-after-statement -Wno-undef -Wno-unknown-pragmas -Wno-stringop-truncation
 LDFLAGS := -s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
 
