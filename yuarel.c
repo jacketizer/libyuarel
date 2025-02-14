@@ -38,8 +38,8 @@
  */
 static inline int natoi(const char *str, size_t len)
 {
-    int i, r = 0;
-    for (i = 0; i < len; i++)
+    int r = 0;
+    for (size_t i = 0; i < len; i++)
     {
         r *= 10;
         r += str[i] - '0';
@@ -420,16 +420,19 @@ int yuarel_split_path(char *path, char **parts, int max_parts)
  */
 int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params, int max_params)
 {
+    int param_count = 0;
+
     if (NULL == query || '\0' == *query)
     {
         return -1;
     }
 
-    int param_count = 0;
     while (param_count < max_params)
     {
         char *curr_key_ptr = query;
         char *curr_end_ptr = strchr(curr_key_ptr, delimiter);
+        char *val_delim;
+
         if (curr_end_ptr != NULL)
         {
             // There will be more kv pairs ahead so zero terminate this kv
@@ -438,7 +441,7 @@ int yuarel_parse_query(char *query, char delimiter, struct yuarel_param *params,
 
         /* Write KV parameter */
         params[param_count].key = curr_key_ptr;
-        char *val_delim = strchr(curr_key_ptr, '=');
+        val_delim = strchr(curr_key_ptr, '=');
         if (val_delim != NULL)
         {
             /* Value Is Present. Split and record */
@@ -485,13 +488,13 @@ char *yuarel_url_decode(char *str)
 #define YUAREL_URL_DECODE_IS_HEX(ch) (('0' <= (ch) && (ch) <= '9') || ('a' <= (ch) && (ch) <= 'f') || ('A' <= (ch) && (ch) <= 'F'))
 #define YUAREL_URL_DECODE_PARSE_HEX(ch) (('0' <= (ch) && (ch) <= '9') ? (ch) - '0' : ('a' <= (ch) && (ch) <= 'f') ? 10 + (ch) - 'a' : ('A' <= (ch) && (ch) <= 'F') ? 10 + (ch) - 'A' : 0)
 
+    const char *read_ptr = str;
+    char *write_ptr = str;
+
     if (NULL == str || '\0' == *str)
     {
         return str;
     }
-
-    const char *read_ptr = str;
-    char *write_ptr = str;
 
     while (*read_ptr)
     {
