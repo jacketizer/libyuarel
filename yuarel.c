@@ -486,7 +486,7 @@ char *yuarel_url_decode(char *str)
 {
     // Hex decoding utilities
 #define YUAREL_URL_DECODE_IS_HEX(ch) (('0' <= (ch) && (ch) <= '9') || ('a' <= (ch) && (ch) <= 'f') || ('A' <= (ch) && (ch) <= 'F'))
-#define YUAREL_URL_DECODE_PARSE_HEX(ch) (('0' <= (ch) && (ch) <= '9') ? (ch) - '0' : ('a' <= (ch) && (ch) <= 'f') ? 10 + (ch) - 'a' : ('A' <= (ch) && (ch) <= 'F') ? 10 + (ch) - 'A' : 0)
+#define YUAREL_URL_DECODE_PARSE_HEX(ch) (('0' <= (ch) && (ch) <= '9') ? ((ch) - '0') : (('a' <= (ch) && (ch) <= 'f') ? (10 + (ch) - 'a') : (('A' <= (ch) && (ch) <= 'F') ? (10 + (ch) - 'A') : 0)))
 
     const char *read_ptr = str;
     char *write_ptr = str;
