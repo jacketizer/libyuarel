@@ -43,14 +43,14 @@ static int strcmp_wrap(const char *str, const char *str2)
     return strcmp(str, str2);
 }
 
-#define assert_struct(as_url, as_scheme, as_user, as_pass, as_host, as_port, as_path, as_query, as_fragment)                                                                                           \
-    mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp_wrap(as_url.scheme, as_scheme));                                                                                         \
-    mu_silent_assert("should set the username attribute correctly", 0 == strcmp_wrap(as_url.username, as_user));                                                                                       \
-    mu_silent_assert("should set the password attribute correctly", 0 == strcmp_wrap(as_url.password, as_pass));                                                                                       \
-    mu_silent_assert("should set the host attribute correctly", 0 == strcmp_wrap(as_url.host, as_host));                                                                                               \
-    mu_silent_assert("should set the port attribute correctly", as_port == as_url.port);                                                                                                               \
-    mu_silent_assert("should set the path attribute correctly", 0 == strcmp_wrap(as_url.path, as_path));                                                                                               \
-    mu_silent_assert("should set the query attribute correctly", 0 == strcmp_wrap(as_url.query, as_query));                                                                                            \
+#define assert_struct(as_url, as_scheme, as_user, as_pass, as_host, as_port, as_path, as_query, as_fragment)     \
+    mu_silent_assert("should set the scheme attribute correctly", 0 == strcmp_wrap(as_url.scheme, as_scheme));   \
+    mu_silent_assert("should set the username attribute correctly", 0 == strcmp_wrap(as_url.username, as_user)); \
+    mu_silent_assert("should set the password attribute correctly", 0 == strcmp_wrap(as_url.password, as_pass)); \
+    mu_silent_assert("should set the host attribute correctly", 0 == strcmp_wrap(as_url.host, as_host));         \
+    mu_silent_assert("should set the port attribute correctly", as_port == as_url.port);                         \
+    mu_silent_assert("should set the path attribute correctly", 0 == strcmp_wrap(as_url.path, as_path));         \
+    mu_silent_assert("should set the query attribute correctly", 0 == strcmp_wrap(as_url.query, as_query));      \
     mu_silent_assert("should set the fragment attribute correctly", 0 == strcmp_wrap(as_url.fragment, as_fragment));
 
 static const char *test_parse_http_url_ok()
