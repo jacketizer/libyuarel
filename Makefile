@@ -14,9 +14,15 @@ VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 LIBNAME := yuarel
 PKG_NAME := lib$(LIBNAME)-$(VERSION)
 
-CC := gcc
-AR := ar
+CC ?= gcc
+AR ?= ar
+
+ifeq ($(CC),clang)
+CFLAGS := -c -fPIC -g -Wall -Werror -std=c99 -pedantic -Wunused -Wno-uninitialized -Wextra -Wformat-security -Wno-init-self -Wwrite-strings -Wshift-count-overflow -Wdeclaration-after-statement -Wno-undef -Wno-unknown-pragmas -Wno-string-concatenation
+else
 CFLAGS := -c -fPIC -g -Wall -Werror -std=c99 -pedantic -Wunused -Wlogical-op -Wno-uninitialized -Wextra -Wformat-security -Wno-init-self -Wwrite-strings -Wshift-count-overflow -Wdeclaration-after-statement -Wno-undef -Wno-unknown-pragmas -Wno-stringop-truncation
+endif
+
 LDFLAGS := -s -shared -fvisibility=hidden -Wl,--exclude-libs=ALL,--no-as-needed,-soname,lib$(LIBNAME).so.$(VERSION_MAJOR)
 PREFIX ?= /usr
 
