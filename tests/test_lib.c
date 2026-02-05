@@ -206,6 +206,20 @@ static const char *test_parse_http_url_ok()
     assert_struct(url, "https", "jack", "password", "localhost", 8989, "path/to/test", "query=yes&q=jack", "fragment1");
     free(url_string);
 
+    /* Minimal IPv6 URL */
+    url_string = strdup("http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("minimal HTTP IPv6 URL", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210", 0, NULL, NULL, NULL);
+    free(url_string);
+
+    /* IPv6 URL with port */
+    url_string = strdup("http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:8080");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("with port", -1 != rc);
+    assert_struct(url, "http", NULL, NULL, "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210", 8080, NULL, NULL, NULL);
+    free(url_string);
+    
     return 0;
 }
 
@@ -355,6 +369,12 @@ static const char *test_parse_url_fail()
     url_string = strdup("rtsp://@hostname:8910/path");
     rc = yuarel_parse(&url, url_string);
     mu_assert("missing credentials should return -1", -1 == rc);
+    free(url_string);
+
+    /* Incomplete IPv6 hostname */
+    url_string = strdup("https://[::192.9.5.5:8910/path");
+    rc = yuarel_parse(&url, url_string);
+    mu_assert("missing closing bracket for IPv6 hostname should return -1", -1 == rc);
     free(url_string);
 
     return 0;
