@@ -193,15 +193,22 @@ yuarel_parse(struct yuarel *url, char *u)
 			return -1;
 		}
 
-		/* (Port) */
+		/* IPv6 hostname */
 		if (*url->host == '[') {
 			u = strchr(url->host, ']');
-			*u = '\0';
-			u = strchr(u, ':');
+			if (NULL == u) {
+				return -1;
+			}
+
+			*(u++) = '\0';
 			url->host++;
+
+			u = strchr(u, ':');
 		} else {
 			u = strchr(url->host, ':');
 		}
+
+		/* (Port) */
 		if (NULL != u && (NULL == url->path || u < url->path)) {
 			*(u++) = '\0';
 			if ('\0' == *u) {
