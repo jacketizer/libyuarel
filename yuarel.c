@@ -194,7 +194,14 @@ yuarel_parse(struct yuarel *url, char *u)
 		}
 
 		/* (Port) */
-		u = strchr(url->host, ':');
+		if (*url->host == '[') {
+			u = strchr(url->host, ']');
+			*u = '\0';
+			u = strchr(u, ':');
+			url->host++;
+		} else {
+			u = strchr(url->host, ':');
+		}
 		if (NULL != u && (NULL == url->path || u < url->path)) {
 			*(u++) = '\0';
 			if ('\0' == *u) {
