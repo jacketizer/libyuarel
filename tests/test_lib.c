@@ -422,7 +422,7 @@ all_tests()
 	mu_group("yuarel_parse() with an HTTP URL");
 	mu_run_test(test_parse_http_url_ok);
 
-	mu_group("yuarel_parse() with an relative URL");
+	mu_group("yuarel_parse() with a relative URL");
 	mu_run_test(test_parse_http_rel_url_ok);
 
 	mu_group("yuarel_parse() with faulty values");
