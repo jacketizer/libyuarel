@@ -139,6 +139,7 @@ int main(void)
 	int p;
 	struct yuarel url;
 	char *parts[3];
+	struct yuarel_param params[3];
 	char url_string[] = "http://localhost:8989/path/to/test?query=yes#frag=1";
 
 	if (-1 == yuarel_parse(&url, url_string)) {
