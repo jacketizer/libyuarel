@@ -188,11 +188,6 @@ yuarel_parse(struct yuarel *url, char *u)
 			*u = '\0';
 		}
 
-		/* Missing hostname? */
-		if ('\0' == *url->host) {
-			return -1;
-		}
-
 		/* (Port) */
 		u = strchr(url->host, ':');
 		if (NULL != u && (NULL == url->path || u < url->path)) {
@@ -210,7 +205,7 @@ yuarel_parse(struct yuarel *url, char *u)
 
 		/* Missing hostname? */
 		if ('\0' == *url->host) {
-			return -1;
+			url->host = NULL;
 		}
 	} else {
 		/* (Path) */
