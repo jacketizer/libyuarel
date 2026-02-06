@@ -37,3 +37,5 @@ test_lib
 simple
 
 *.swp
+
+.vscode/

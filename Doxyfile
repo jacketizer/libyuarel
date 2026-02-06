@@ -1,0 +1,10 @@
+# Doxyfile configuration for generating documentation for Yuarel URL parser
+
+PROJECT_NAME           = "Yuarel URL Parser"
+OUTPUT_DIRECTORY       = doc
+INPUT                  = src
+FILE_PATTERNS          = *.h *.c
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
