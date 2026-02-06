@@ -276,7 +276,7 @@ int yuarel_parse(struct yuarel *url, char *url_str)
         return -1;
     }
 
-    /* (Port) */
+    /* IPv6 hostname */
     if ('[' == url->host[0])
     {
         /* IPv6 Literal */
